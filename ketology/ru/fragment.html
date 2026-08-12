@@ -50,7 +50,12 @@
 
 .ketology-lp .shell{max-width:var(--shell);margin:0 auto}
 .ketology-lp .pad{padding-inline:20px}
-.ketology-lp .section{margin-top:96px}
+.ketology-lp .section{margin-top:96px}/* WHY: последний блок вплотную упирался в подвал сайта. Задаём именно на
+   :last-child, а не на <main> — тогда отступ доезжает и до еком-фрагмента,
+   где тега <main> уже нет. */
+
+
+.ketology-lp .section:last-child{margin-bottom:80px}
 
 .ketology-lp .h1{font-size:40px;line-height:45px;font-weight:500;letter-spacing:-1.2px}
 .ketology-lp .h2{font-size:40px;line-height:48px;font-weight:500;letter-spacing:-1.2px;text-align:center}
@@ -264,7 +269,210 @@
 }
 
 </style>
-<div class="ketology-lp">
+<div class="ketology-lp"> — тогда отступ доезжает и до еком-фрагмента,
+   где тега <main> уже нет. */
+.section:last-child{margin-bottom:80px}
+
+.h1{font-size:40px;line-height:45px;font-weight:500;letter-spacing:-1.2px}
+.h2{font-size:40px;line-height:48px;font-weight:500;letter-spacing:-1.2px;text-align:center}
+.h2--tight{line-height:52px;letter-spacing:-.8px}
+.h3{font-size:32px;line-height:36px;font-weight:500}
+.h4{font-size:30px;line-height:34px;font-weight:500}
+.h5{font-size:26px;line-height:32px;font-weight:500}
+.body{font-size:16px;line-height:21px;font-weight:300}
+
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--accent);color:var(--white);
+  font-size:16px;line-height:21px;font-weight:500;
+  padding:14px 24px 15px;border-radius:var(--r-pill);
+  text-decoration:none;border:0;cursor:pointer;
+  transition:background .18s ease,transform .18s ease;
+}
+.btn:hover{background:var(--accent-deep)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+
+/* Маркированный список с треугольным маркером (Polygon 7 из макета) */
+.marks{display:flex;flex-direction:column;gap:12px;list-style:none;margin:0;padding:0}
+.marks li{display:flex;gap:10px;font-size:16px;line-height:21px;font-weight:300}
+.marks li::before{
+  content:"";flex:0 0 11px;width:11px;height:11px;margin-top:5px;
+  background:var(--accent);clip-path:polygon(0 0,100% 50%,0 100%);
+}
+
+/* ── block 1 — hero ────────────────────────────────────────────────────────── */
+.hero{display:grid;grid-template-columns:629fr 748fr;gap:23px;margin-top:18px}
+.hero__card{
+  background:var(--beige);border-radius:var(--r-card);
+  padding:44px 64px 64px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.hero__logo{width:129px;height:auto}
+.hero__body{display:flex;flex-direction:column;gap:32px;align-items:flex-start;max-width:467px}
+.hero__lead{max-width:366px}
+.hero__img{border-radius:var(--r-card);object-fit:cover;width:100%;height:100%}
+
+/* ── block 2 — MCT + состав ────────────────────────────────────────────────── */
+.mct{display:grid;grid-template-columns:640fr 481fr;gap:80px;align-items:center;margin-top:40px}
+.mct__img{border-radius:var(--r-card);width:100%;height:auto;object-fit:cover}
+.mct__text{display:flex;flex-direction:column;gap:32px}
+.mct__lead{max-width:416px}
+
+.composition{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;margin-top:41px}
+.comp-card{
+  background:var(--white);border-radius:var(--r-card);
+  padding:24px 24px 32px;display:flex;flex-direction:column;gap:24px;
+}
+.comp-card__icon{width:180px;height:180px;border-radius:50%;object-fit:cover}
+.comp-card__title{min-height:96px}
+
+/* ── block 3 — нутриенты ───────────────────────────────────────────────────── */
+.nutri{
+  position:relative;overflow:hidden;border-radius:var(--r-card);
+  background:linear-gradient(135deg,#D94938 0%,#FF8475 100%);
+  color:var(--white);padding:64px 81px;min-height:672px;
+  display:flex;align-items:center;
+}
+.nutri__inner{position:relative;z-index:1;display:flex;flex-direction:column;gap:48px;max-width:631px}
+.nutri__title{font-size:40px;line-height:48px;font-weight:500;letter-spacing:-1.2px;max-width:373px}
+.nutri__note{font-size:18px;line-height:24px;font-weight:300;margin-bottom:24px}
+.nutri__grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px 24px;max-width:631px}
+.stat{display:flex;flex-direction:column;gap:4px}
+.stat__v{font-size:54px;line-height:65px;font-weight:500;letter-spacing:-1.62px}
+.stat__v span{font-size:32px;line-height:39px;letter-spacing:-.96px}
+.stat__l{font-size:20px;line-height:27px;font-weight:300}
+.nutri__note-small{font-size:16px;line-height:19px;font-weight:300;max-width:439px;opacity:.9}
+/* WHY: в макете фрейм protein прижат к правой границе блока и занимает всю его высоту
+   (806..1440 × 2371..3043). Тянем картинку по высоте — ширина следует за пропорцией,
+   поэтому при росте блока (длинные переводы) картинка увеличивается вместе с ним. */
+.nutri__media{position:absolute;z-index:0;right:0;top:0;bottom:0}
+.nutri__media img{height:100%;width:auto;max-width:none;object-fit:contain;object-position:right bottom}
+
+/* ── block 4 — сравнение ───────────────────────────────────────────────────── */
+.compare__head{display:grid;grid-template-columns:608fr 309fr 309fr;gap:12px;margin-top:48px;margin-bottom:12px}
+.compare__head span{text-align:center;font-weight:500}
+.compare__head span:nth-child(2){font-size:26px;line-height:35px}
+.compare__head span:nth-child(3){font-size:20px;line-height:27px}
+.crow{display:grid;grid-template-columns:608fr 309fr 309fr;gap:12px;margin-bottom:12px}
+.crow > *{
+  background:var(--white);border-radius:var(--r-row);
+  padding:24px 12px 24px 20px;display:flex;align-items:center;
+  font-size:20px;line-height:27px;font-weight:500;
+}
+.crow__k{background:var(--beige);justify-content:center;gap:8px;padding-inline:12px}
+.crow__d{justify-content:center;font-size:18px;line-height:24px;font-weight:300}
+.tick{flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:var(--accent-dot);position:relative}
+.tick::after{
+  content:"";position:absolute;left:6px;top:5px;width:7px;height:4px;
+  border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg);
+}
+.cross{flex:0 0 20px;width:20px;height:20px;position:relative}
+.cross::before,.cross::after{
+  content:"";position:absolute;left:2px;top:9px;width:16px;height:2px;background:var(--ink);border-radius:2px;
+}
+.cross::before{transform:rotate(45deg)}
+.cross::after{transform:rotate(-45deg)}
+
+/* ── block 5 — задачи ──────────────────────────────────────────────────────── */
+.tasks{display:grid;grid-template-columns:468fr 405fr 405fr;grid-template-rows:306px 306px;gap:16px;margin-top:40px}
+.task{position:relative;overflow:hidden;background:var(--beige);border-radius:var(--r-card);padding:32px}
+.task--tall{grid-row:span 2}
+/* Ellipse 115 — светлое пятно под картинкой. Смещения сняты из макета */
+.task__blob{
+  position:absolute;left:40.2%;top:16.7%;
+  width:310px;height:310px;border-radius:50%;background:var(--beige-soft);
+}
+.task--tall .task__blob{left:13.9%;top:32.3%;width:545px;height:545px}
+.task__txt{position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;max-width:187px}
+.task--tall .task__txt{max-width:436px}
+.task__desc{font-size:16px;line-height:21px;font-weight:300}
+/* WHY: в макете картинка плитки — компонент (woman, image-1…image-4), прижатый
+   к ПРАВОМУ НИЖНЕМУ углу карточки и обрезанный по его рамке. Экспортируем компонент
+   целиком и ставим вплотную к углу; ширина = ширина компонента / ширина карточки. */
+.task__img{position:absolute;z-index:1;right:0;bottom:0;width:54.6%;height:auto;object-fit:contain}
+.task--tall .task__img{width:84.8%}
+
+/* ── block 6 — вкусы ───────────────────────────────────────────────────────── */
+.flavors{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;margin-top:40px}
+.flavor{
+  position:relative;overflow:hidden;border-radius:var(--r-card);
+  background:var(--cream);min-height:609px;display:flex;flex-direction:column;justify-content:flex-end;
+}
+.flavor--grey{background:var(--grey-card)}
+/* WHY: в новом макете карточка вкуса — одна цельная картинка (416×609), а не слои */
+.flavor__pack{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.flavor__foot{
+  position:relative;z-index:2;padding:0 30px 40px;
+  display:flex;flex-direction:column;gap:32px;align-items:center;text-align:center;
+}
+.flavor__name{font-size:30px;line-height:37px;font-weight:500;letter-spacing:-.6px}
+.flavor__sub{font-size:16px;line-height:21px;font-weight:300;margin-top:12px}
+
+/* ── Экспертный взгляд ─────────────────────────────────────────────────────── */
+.expert{display:grid;grid-template-columns:640fr 531fr;gap:80px;align-items:center;margin-top:40px}
+.expert__img{border-radius:var(--r-card);width:100%;height:auto;object-fit:cover}
+.expert__body{display:flex;flex-direction:column;gap:40px}
+.expert__quote{font-size:18px;line-height:29px;font-weight:300}
+.expert__name{font-size:18px;line-height:24px;font-weight:500}
+.expert__role{font-size:16px;line-height:21px;font-weight:300;color:var(--muted);margin-top:8px;max-width:424px}
+
+/* ── block 7 — качество ────────────────────────────────────────────────────── */
+.quality{display:grid;grid-template-columns:407px 1fr;gap:264px;align-items:center}
+.quality__txt{display:flex;flex-direction:column;gap:24px}
+.quality__logos{display:flex;align-items:center;justify-content:flex-end;gap:72px}
+/* WHY: логотипы в макете лежат под маской-заливкой #656462 — повторяем фильтром.
+   Размер берётся из width/height в разметке: экспорт 2x, любой width:auto удвоил бы их. */
+.quality__logos img{filter:grayscale(1) opacity(.75)}
+
+/* ── block 8 — финальный CTA ───────────────────────────────────────────────── */
+.cta{display:grid;grid-template-columns:690fr 690fr;gap:20px}
+.cta__img{border-radius:var(--r-card);width:100%;height:100%;object-fit:cover}
+.cta__card{
+  background:var(--beige);border-radius:var(--r-card);
+  display:flex;flex-direction:column;gap:32px;align-items:center;justify-content:center;
+  text-align:center;padding:64px 109px;min-height:617px;
+}
+.cta__lead{max-width:277px}
+
+/* ── Адаптив ───────────────────────────────────────────────────────────────── */
+@media (max-width:1200px){
+  .hero,.mct,.cta,.expert{grid-template-columns:1fr;gap:24px}
+  .hero__card{padding:40px}
+  .mct,.expert{gap:32px}
+  .cta__card{padding:56px 40px;min-height:0}
+  .quality{grid-template-columns:1fr;gap:40px}
+  .nutri{flex-direction:column;align-items:stretch;padding:48px 40px}
+  /* на узком экране картинка уходит под текст, иначе она бы легла поверх цифр */
+  .nutri__media{position:static;margin-top:32px}
+  .nutri__media img{height:auto;width:100%;max-width:420px;margin-inline:auto}
+  .tasks{grid-template-columns:1fr 1fr;grid-template-rows:none}
+  .task--tall{grid-row:span 1;min-height:420px}
+  .composition,.flavors{grid-template-columns:1fr;gap:24px}
+  .comp-card__title{min-height:0}
+}
+@media (max-width:820px){
+  .section{margin-top:64px}
+  .h1,.h2{font-size:32px;line-height:38px;letter-spacing:-.6px}
+  .h3{font-size:26px;line-height:31px}
+  .nutri__title{font-size:30px;line-height:36px}
+  .nutri__grid{grid-template-columns:repeat(2,1fr);gap:28px}
+  .stat__v{font-size:40px;line-height:48px}
+  .tasks{grid-template-columns:1fr}
+  .compare__head,.crow{grid-template-columns:1fr;gap:8px}
+  .compare__head{display:none}
+  .crow > *{padding:16px}
+  .crow__k::after{content:" — Кетолоджи";font-weight:300;font-size:14px}
+  .crow__d::after{content:" — низкокалорийная диета";font-weight:300;font-size:14px;margin-left:6px}
+  .quality__logos{gap:32px;justify-content:flex-start;flex-wrap:wrap}
+  .quality__logos img{max-height:64px;width:auto}
+}
+</style>
+</head>
+<body>
+
+
+
+<main>
   <!-- ── Hero ── -->
   <section class="shell pad">
     <div class="hero">
@@ -344,7 +552,7 @@
             <div class="stat"><span class="stat__v">13</span><span class="stat__l">витаминов</span></div>
           </div>
         </div>
-        <p class="nutri__note-small">КБЖУ у Кетолоджи Персик и Кетолоджи Шоколад может незначительно отличаться от предстравленной. КБЖУ у Кетолоджи Персик и Кетолоджи Шоколад может незначительно отличаться от предстравленной.</p>
+        <p class="nutri__note-small">КБЖУ у Кетолоджи Персик и Кетолоджи Шоколад может незначительно отличаться от представленной.</p>
       </div>
       <div class="nutri__media">
         <img src="https://kolossdesign.github.io/sw-prototypes/ketology/assets/nutrients-pack.webp" alt="Банка Кетолоджи" width="640" height="694" loading="lazy">
