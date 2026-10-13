@@ -73,6 +73,8 @@
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .sheetClose { position: absolute; right: 16px; top: 20px; width: 32px; height: 32px; border: none; background: none; padding: 0; cursor: pointer; color: var(--ink-2); display: flex; align-items: center; justify-content: center; }
   .sheetPlainHead { position: relative; height: 56px; }
+  .sheetBack { position: absolute; left: 12px; top: 20px; height: 32px; border: none; background: none; padding: 0 4px; cursor: pointer; color: var(--link); font-size: 16px; display: flex; align-items: center; gap: 6px; }
+  .sheetBack span { font-size: 22px; line-height: 1; }
 
   /* Шапка программы в шторке */
   .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy) right top / cover no-repeat url(assets/bg-sheet-178.svg); border-radius: 16px 16px 0 0; }
@@ -483,10 +485,13 @@
     );
   }
 
-  function HowSheet({ onClose, go }) {
+  function HowSheet({ onClose, onBack, go }) {
     return (
       <>
-        <div className="sheetPlainHead"><button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button></div>
+        <div className="sheetPlainHead">
+          {onBack && <button type="button" className="sheetBack" onClick={onBack}><span>‹</span> Назад</button>}
+          <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
+        </div>
         <div className="how">
           <h2 className="h1">{T.howTitle}</h2>
           {T.howSteps.map((s, i) => <div className="step" key={s}><i>{i + 1}</i><span>{s}</span></div>)}
@@ -531,6 +536,7 @@
   function App() {
     const [stack, setStack] = useState([{ s: START }]);
     const [sheet, setSheet] = useState(null);
+    const [howFrom, setHowFrom] = useState(null); // шторка, из которой открыли «Как это работает»
     const [menu, setMenu] = useState(false);
     const [toast, setToast] = useState(false);
     const toastT = useRef(null);
@@ -552,7 +558,9 @@
       setStack(stack.slice(0, -1)); setSheet(prev.sheet || null);
     };
     // «Как это работает» открывается шторкой поверх, остальное — экранами
-    const goFromSheet = (s, title) => (s === 'how' ? setSheet('how') : go(s, title));
+    const goFromSheet = (s, title) => {
+      if (s === 'how') { setHowFrom(sheet); setSheet('how'); } else go(s, title);
+    };
     const open = (name) => { setMenu(false); setSheet(name); };
     const copy = () => {
       // WHY: на http/в iframe буфер может быть запрещён — тост показываем в любом случае
@@ -579,7 +587,7 @@
             <div className="sheet" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
               {sheet === 'refs' && <RefsSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
               {sheet === 'share' && <ShareSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
-              {sheet === 'how' && <HowSheet onClose={() => setSheet(null)} go={goFromSheet} />}
+              {sheet === 'how' && <HowSheet onClose={() => setSheet(null)} onBack={howFrom ? () => setSheet(howFrom) : null} go={goFromSheet} />}
             </div>
           </div>
         )}
