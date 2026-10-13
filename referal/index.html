@@ -405,12 +405,12 @@
           <button type="button" className="hot" aria-label="Главная" style={at(8, 56, 70, 28, PRODUCT_A_H)} onClick={() => go('main')} />
           {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
           <button type="button" className="hot" aria-label="В корзину" style={at(16, 665, 311, 40, PRODUCT_A_H)} onClick={() => go('thanks')} />
-          {/* WHY: при включённой программе «Поделиться» переезжает в баннер — иконку прода у CTA закрываем белой плашкой */}
-          {STATE === 'none'
+          {/* WHY: пока программа активна, «Поделиться» живёт в баннере — иконку прода у CTA закрываем белой плашкой; после завершения — дефолт прода */}
+          {STATE !== 'active'
             ? <button type="button" className="hot" aria-label="Поделиться" style={at(328, 664, 44, 44, PRODUCT_A_H)} onClick={() => open('share')} />
             : <div style={{ position: 'absolute', ...at(330, 662, 45, 46, PRODUCT_A_H), background: '#fff' }} />}
         </div>
-        {STATE !== 'none' && <div className="pad" style={{ margin: '8px 0 20px' }}><Banner104 onShare={() => open('share')} /></div>}
+        {STATE === 'active' && <div className="pad" style={{ margin: '8px 0 20px' }}><Banner104 onShare={() => open('share')} /></div>}
         {/* Полная продуктовая прода до футера, нарезана частями по 2000px, чтобы грузилась по мере прокрутки */}
         {[1, 2, 3, 4, 5, 6].map((i) => <img className="slice" key={i} src={`assets/product-b${i}.jpg`} alt="" loading={i > 1 ? 'lazy' : undefined} />)}
       </>
