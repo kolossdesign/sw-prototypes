@@ -25,7 +25,7 @@
   .sw, .sw input, .sw button { font-family: 'Gerbera', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   .sw {
     height: 100%; display: flex; flex-direction: column; position: relative;
-    max-width: 480px; margin: 0 auto; background: var(--white); color: var(--ink);
+    width: 100%; background: var(--white); color: var(--ink);
     font-size: 16px; -webkit-font-smoothing: antialiased; overflow: hidden;
   }
   .sw button { -webkit-tap-highlight-color: transparent; }
@@ -36,23 +36,26 @@
   .hot { position: absolute; background: transparent; border: none; padding: 0; cursor: pointer; }
   .pad { padding: 0 16px; }
 
-  /* Баннер программы: фон из SVG макета, текст и монетки — живые слои */
+  /* Баннер программы: фон из SVG макета, текст и монетки — живые слои.
+     WHY: высота от макета (140/104/60) — минимальная, ширина резиновая; монетки прибиты к правому краю */
   .banner {
-    position: relative; display: block; width: 100%; border: none; padding: 0; text-align: left;
-    border-radius: 16px; overflow: hidden; cursor: pointer; color: #fff;
-    background: var(--navy) center / 100% 100% no-repeat;
+    position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 100%;
+    border: none; text-align: left; border-radius: 16px; overflow: hidden; cursor: pointer; color: #fff;
+    background: var(--navy) right center / cover no-repeat; box-sizing: border-box; padding: 18px 16px 20px;
   }
-  .banner--140 { aspect-ratio: 343 / 140; background-image: url(assets/bg-banner-140.svg); }
-  .banner--104 { aspect-ratio: 343 / 104; background-image: url(assets/bg-banner-104.svg); }
-  .banner--60  { aspect-ratio: 343 / 60;  background-image: url(assets/bg-menu-60.svg); }
+  .banner--140 { min-height: 140px; background-image: url(assets/bg-banner-140.svg); }
+  .banner--104 { min-height: 104px; background-image: url(assets/bg-banner-104.svg); }
+  .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; background-image: url(assets/bg-menu-60.svg); }
   .banner .coins { position: absolute; pointer-events: none; }
-  .banner--140 .coins { left: 70.7%; top: 5%; width: 37%; }
-  .banner--104 .coins { left: 70.7%; top: -10.6%; width: 37%; }
-  .banner--60 .coins  { left: 68.3%; top: -11%; width: 32%; }
-  .bTitle { position: absolute; left: 16px; top: 20px; font-size: 16px; font-weight: 500; line-height: 20px; }
-  .bText { position: absolute; left: 16px; top: 48px; width: 68%; font-size: 14px; line-height: 18px; }
-  .banner--60 .bText { top: 12px; width: 70%; }
-  .bLink { position: absolute; left: 16px; bottom: 22px; font-size: 14px; color: var(--cyan-link); display: flex; align-items: center; gap: 8px; }
+  .banner--140 .coins { right: -26px; top: 7px; width: 127px; }
+  .banner--104 .coins { right: -26px; top: -11px; width: 127px; }
+  .banner--60  .coins { right: -1px; top: -7px; width: 110px; }
+  .bTitle, .bText, .bLink { position: relative; }
+  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 96px; }
+  .bText { margin-top: 8px; font-size: 14px; line-height: 18px; max-width: calc(100% - 96px); }
+  .banner--60 .bText { margin-top: 0; max-width: calc(100% - 100px); }
+  .banner--104 .bTitle { padding-right: 56px; }
+  .bLink { margin-top: auto; padding-top: 14px; font-size: 14px; color: var(--cyan-link); display: flex; align-items: center; gap: 8px; }
   .bShare {
     position: absolute; right: 16px; top: 20px; width: 40px; height: 40px; border-radius: 12px;
     background: #fff; display: flex; align-items: center; justify-content: center; color: var(--navy-ink);
@@ -77,14 +80,15 @@
   .sheetBack span { font-size: 22px; line-height: 1; }
 
   /* Шапка программы в шторке */
-  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy) right top / cover no-repeat url(assets/bg-sheet-178.svg); border-radius: 16px 16px 0 0; }
+  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy) right top / cover no-repeat url(assets/bg-sheet-178.svg); min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
   .pHead--ended { background-image: url(assets/bg-sheet-196.svg); padding-top: 64px; }
   .pHead .sheetClose { color: #fff; top: 20px; }
   .pHead .coins { position: absolute; right: 5px; top: 44px; width: 98px; pointer-events: none; }
-  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: 250px; }
+  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 88px); }
   .pHead--ended .pTitle { max-width: none; }
-  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; }
-  .pLinks { display: flex; gap: 24px; margin-top: 16px; }
+  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; max-width: calc(100% - 96px); }
+  .pHead--ended .pText { max-width: none; }
+  .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
   .pLinks button { background: none; border: none; padding: 0; color: var(--cyan-link); font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .badge { position: absolute; left: 16px; top: 24px; background: var(--badge); color: var(--navy-ink); font-size: 14px; font-weight: 500; line-height: 24px; padding: 0 8px; border-radius: 4px; }
 
@@ -259,6 +263,10 @@
     <svg width="26" height="24" viewBox="0 0 26 24" fill="none" aria-hidden="true"><path d="M2 6h9M2 12h6M2 18h9" stroke="currentColor" strokeLinecap="round" /><circle cx="17" cy="11" r="5" stroke="currentColor" /><path d="m20.6 14.6 3.4 3.4" stroke="currentColor" strokeLinecap="round" /></svg>
   );
 
+  /* WHY: слои прода тянутся по ширине экрана, поэтому хотспоты задаём в % от слоя (координаты сняты в сетке 375px) */
+  const at = (l, t, w, h, H) => ({ left: l / 3.75 + '%', top: (t / H) * 100 + '%', width: w / 3.75 + '%', height: (h / H) * 100 + '%' });
+  const MAIN_B_H = 2342, PRODUCT_A_H = 761;
+
   function Coins({ className }) { return <img className={className || 'coins'} src="assets/coins.png" alt="" />; }
 
   /* Баннеры: 140 — главная и сенкью, 104 — продуктовая (с «поделиться»), 60 — пункт меню ЛК */
@@ -311,7 +319,7 @@
         <div className="sliceWrap">
           <img className="slice" src="assets/main-b.jpg" alt="" />
           {/* Карточка «Берберин» в «Хитах продаж» ведёт на продуктовую */}
-          <button type="button" className="hot" aria-label="Берберин & Кофакторы" style={{ left: 16, top: 80, width: 164, height: 340 }} onClick={() => go('product')} />
+          <button type="button" className="hot" aria-label="Берберин & Кофакторы" style={at(16, 80, 164, 340, MAIN_B_H)} onClick={() => go('product')} />
         </div>
       </>
     );
@@ -322,16 +330,17 @@
       <>
         <div className="sliceWrap">
           <img className="slice" src="assets/product-a.jpg" alt="" />
-          <button type="button" className="hot" aria-label="Главная" style={{ left: 8, top: 56, width: 70, height: 28 }} onClick={() => go('main')} />
+          <button type="button" className="hot" aria-label="Главная" style={at(8, 56, 70, 28, PRODUCT_A_H)} onClick={() => go('main')} />
           {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
-          <button type="button" className="hot" aria-label="В корзину" style={{ left: 16, top: 665, width: 311, height: 40 }} onClick={() => go('thanks')} />
+          <button type="button" className="hot" aria-label="В корзину" style={at(16, 665, 311, 40, PRODUCT_A_H)} onClick={() => go('thanks')} />
           {/* WHY: при включённой программе «Поделиться» переезжает в баннер — иконку прода у CTA закрываем белой плашкой */}
           {STATE === 'none'
-            ? <button type="button" className="hot" aria-label="Поделиться" style={{ left: 328, top: 664, width: 44, height: 44 }} onClick={() => open('share')} />
-            : <div style={{ position: 'absolute', left: 330, top: 662, width: 45, height: 46, background: '#fff' }} />}
+            ? <button type="button" className="hot" aria-label="Поделиться" style={at(328, 664, 44, 44, PRODUCT_A_H)} onClick={() => open('share')} />
+            : <div style={{ position: 'absolute', ...at(330, 662, 45, 46, PRODUCT_A_H), background: '#fff' }} />}
         </div>
         {STATE !== 'none' && <div className="pad" style={{ margin: '8px 0 20px' }}><Banner104 onShare={() => open('share')} /></div>}
-        <img className="slice" src="assets/product-b.jpg" alt="" />
+        {/* Полная продуктовая прода до футера, нарезана частями по 2000px, чтобы грузилась по мере прокрутки */}
+        {[1, 2, 3, 4, 5, 6].map((i) => <img className="slice" key={i} src={`assets/product-b${i}.jpg`} alt="" loading={i > 1 ? 'lazy' : undefined} />)}
       </>
     );
   }
