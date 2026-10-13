@@ -325,7 +325,10 @@
           <button type="button" className="hot" aria-label="Главная" style={{ left: 8, top: 56, width: 70, height: 28 }} onClick={() => go('main')} />
           {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
           <button type="button" className="hot" aria-label="В корзину" style={{ left: 16, top: 665, width: 311, height: 40 }} onClick={() => go('thanks')} />
-          <button type="button" className="hot" aria-label="Поделиться" style={{ left: 328, top: 664, width: 44, height: 44 }} onClick={() => open('share')} />
+          {/* WHY: при включённой программе «Поделиться» переезжает в баннер — иконку прода у CTA закрываем белой плашкой */}
+          {STATE === 'none'
+            ? <button type="button" className="hot" aria-label="Поделиться" style={{ left: 328, top: 664, width: 44, height: 44 }} onClick={() => open('share')} />
+            : <div style={{ position: 'absolute', left: 330, top: 662, width: 45, height: 46, background: '#fff' }} />}
         </div>
         {STATE !== 'none' && <div className="pad" style={{ margin: '8px 0 20px' }}><Banner104 onShare={() => open('share')} /></div>}
         <img className="slice" src="assets/product-b.jpg" alt="" />
