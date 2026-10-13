@@ -41,11 +41,20 @@
   .banner {
     position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 100%;
     border: none; text-align: left; border-radius: 16px; overflow: hidden; cursor: pointer; color: #fff;
-    background: var(--navy) right center / cover no-repeat; box-sizing: border-box; padding: 18px 16px 20px;
+    background: var(--navy); box-sizing: border-box; padding: 18px 16px 20px; isolation: isolate;
   }
-  .banner--140 { min-height: 140px; background-image: url(assets/bg-banner-140.svg); }
-  .banner--104 { min-height: 104px; background-image: url(assets/bg-banner-104.svg); }
-  .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; background-image: url(assets/bg-menu-60.svg); }
+  /* Размытый отсвет (пятна из SVG макета) — отдельным слоем, чтобы выезжал справа при появлении баннера */
+  .banner::before, .pHead::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: var(--glow) right center / cover no-repeat;
+    opacity: 0; transform: translateX(45%) scale(1.15);
+  }
+  .banner.is-in::before, .pHead::before { animation: glowIn 1.4s cubic-bezier(.2, .7, .2, 1) .15s forwards; }
+  @keyframes glowIn { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .banner::before, .pHead::before { animation: none !important; opacity: 1; transform: none; } }
+  .banner--140 { min-height: 140px; --glow: url(assets/glow-banner-140.svg); }
+  .banner--104 { min-height: 104px; --glow: url(assets/glow-banner-104.svg); }
+  .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; --glow: url(assets/glow-menu-60.svg); }
   .banner .coins { position: absolute; pointer-events: none; }
   .banner--140 .coins { right: -26px; top: 7px; width: 127px; }
   .banner--104 .coins { right: -26px; top: -11px; width: 127px; }
@@ -76,17 +85,15 @@
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   .sheetClose { position: absolute; right: 16px; top: 20px; width: 32px; height: 32px; border: none; background: none; padding: 0; cursor: pointer; color: var(--ink-2); display: flex; align-items: center; justify-content: center; }
   .sheetPlainHead { position: relative; height: 56px; }
-  .sheetBack { position: absolute; left: 12px; top: 20px; height: 32px; border: none; background: none; padding: 0 4px; cursor: pointer; color: var(--link); font-size: 16px; display: flex; align-items: center; gap: 6px; }
-  .sheetBack span { font-size: 22px; line-height: 1; }
 
   /* Шапка программы в шторке */
-  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy) right top / cover no-repeat url(assets/bg-sheet-178.svg); min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
-  .pHead--ended { background-image: url(assets/bg-sheet-196.svg); padding-top: 64px; }
+  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
+  .pHead--ended { --glow: url(assets/glow-sheet-196.svg); padding-top: 64px; }
   .pHead .sheetClose { color: #fff; top: 20px; }
   .pHead .coins { position: absolute; right: 5px; top: 44px; width: 98px; pointer-events: none; }
   .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 88px); }
   .pHead--ended .pTitle { max-width: none; }
-  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; max-width: calc(100% - 96px); }
+  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; max-width: calc(100% - 70px); }
   .pHead--ended .pText { max-width: none; }
   .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
   .pLinks button { background: none; border: none; padding: 0; color: var(--cyan-link); font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
@@ -267,12 +274,27 @@
   const at = (l, t, w, h, H) => ({ left: l / 3.75 + '%', top: (t / H) * 100 + '%', width: w / 3.75 + '%', height: (h / H) * 100 + '%' });
   const MAIN_B_H = 2342, PRODUCT_A_H = 761;
 
+  /* Анимация отсвета стартует, когда баннер впервые попал в экран, а не при загрузке страницы */
+  function useInView() {
+    const ref = useRef(null);
+    const [inView, setInView] = useState(false);
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !('IntersectionObserver' in window)) { setInView(true); return undefined; }
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); io.disconnect(); } }, { threshold: 0.6 });
+      io.observe(el);
+      return () => io.disconnect();
+    }, []);
+    return [ref, inView ? ' is-in' : ''];
+  }
+
   function Coins({ className }) { return <img className={className || 'coins'} src="assets/coins.png" alt="" />; }
 
   /* Баннеры: 140 — главная и сенкью, 104 — продуктовая (с «поделиться»), 60 — пункт меню ЛК */
   function Banner140({ onOpen }) {
+    const [ref, cls] = useInView();
     return (
-      <button type="button" className="banner banner--140" onClick={onOpen}>
+      <button type="button" ref={ref} className={"banner banner--140" + cls} onClick={onOpen}>
         <Coins />
         <span className="bTitle">{T.bannerTitle}</span>
         <span className="bText">{T.bannerText}</span>
@@ -281,8 +303,9 @@
     );
   }
   function Banner104({ onShare }) {
+    const [ref, cls] = useInView();
     return (
-      <button type="button" className="banner banner--104" onClick={onShare}>
+      <button type="button" ref={ref} className={"banner banner--104" + cls} onClick={onShare}>
         <Coins />
         <span className="bTitle">{T.bannerTitle}</span>
         <span className="bText">{T.bannerText}</span>
@@ -291,8 +314,9 @@
     );
   }
   function Banner60({ onOpen }) {
+    const [ref, cls] = useInView();
     return (
-      <button type="button" className="banner banner--60" onClick={onOpen}>
+      <button type="button" ref={ref} className={"banner banner--60" + cls} onClick={onOpen}>
         <Coins />
         <span className="bText">{T.menuText}</span>
       </button>
@@ -497,11 +521,10 @@
     );
   }
 
-  function HowSheet({ onClose, onBack, go }) {
+  function HowSheet({ onClose, go }) {
     return (
       <>
         <div className="sheetPlainHead">
-          {onBack && <button type="button" className="sheetBack" onClick={onBack}><span>‹</span> Назад</button>}
           <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
         </div>
         <div className="how">
@@ -573,6 +596,8 @@
     const goFromSheet = (s, title) => {
       if (s === 'how') { setHowFrom(sheet); setSheet('how'); } else go(s, title);
     };
+    // WHY: «Как это работает» — вложенный попап; закрытие возвращает в попап, из которого его открыли
+    const closeSheet = () => setSheet(sheet === 'how' && howFrom ? howFrom : null);
     const open = (name) => { setMenu(false); setSheet(name); };
     const copy = () => {
       // WHY: на http/в iframe буфер может быть запрещён — тост показываем в любом случае
@@ -595,11 +620,11 @@
 
         {menu && <Menu onClose={() => setMenu(false)} open={open} go={go} />}
         {sheet && (
-          <div className="scrim" onClick={() => setSheet(null)}>
+          <div className="scrim" onClick={closeSheet}>
             <div className="sheet" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
               {sheet === 'refs' && <RefsSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
               {sheet === 'share' && <ShareSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
-              {sheet === 'how' && <HowSheet onClose={() => setSheet(null)} onBack={howFrom ? () => setSheet(howFrom) : null} go={goFromSheet} />}
+              {sheet === 'how' && <HowSheet onClose={closeSheet} go={goFromSheet} />}
             </div>
           </div>
         )}
