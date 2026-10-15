@@ -76,6 +76,9 @@
     background: #fff; display: flex; align-items: center; justify-content: center; color: var(--navy-ink);
   }
 
+  .cartBtn { position: absolute; border: none; border-radius: 4px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; padding: 0; }
+  .cartBtn:active { background: var(--brand-d); }
+
   /* Таббар прода */
   .tabbar { flex: 0 0 auto; height: 52px; display: flex; border-top: 1px solid var(--line-2); background: #fff; }
   .tabbar button { flex: 1; background: none; border: none; display: flex; align-items: center; justify-content: center; color: var(--ink); cursor: pointer; padding: 0; }
@@ -278,7 +281,7 @@
 
   /* WHY: слои прода тянутся по ширине экрана, поэтому хотспоты задаём в % от слоя (координаты сняты в сетке 375px) */
   const at = (l, t, w, h, H) => ({ left: l / 3.75 + '%', top: (t / H) * 100 + '%', width: w / 3.75 + '%', height: (h / H) * 100 + '%' });
-  const PRODUCT_A_H = 761;
+  const PRODUCT_A_H = 713;
 
   /* Анимация отсвета стартует, когда баннер впервые попал в экран, а не при загрузке страницы */
   function useInView() {
@@ -404,13 +407,17 @@
           <img className="slice" src="assets/product-a.jpg" alt="" />
           <button type="button" className="hot" aria-label="Главная" style={at(8, 56, 70, 28, PRODUCT_A_H)} onClick={() => go('main')} />
           {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
-          <button type="button" className="hot" aria-label="В корзину" style={at(16, 665, 311, 40, PRODUCT_A_H)} onClick={() => go('thanks')} />
+          {/* WHY: на мобилке CTA «В корзину» по макету 160px — растровую кнопку прода закрываем и рисуем свою */}
+          <div style={{ position: 'absolute', ...at(14, 663, 316, 44, PRODUCT_A_H), background: '#fff' }} />
+          <button type="button" className="cartBtn" style={{ ...at(16, 665, 0, 40, PRODUCT_A_H), width: 160 }} onClick={() => go('thanks')}>В корзину</button>
           {/* WHY: пока программа активна, «Поделиться» живёт в баннере — иконку прода у CTA закрываем белой плашкой; после завершения — дефолт прода */}
           {STATE !== 'active'
             ? <button type="button" className="hot" aria-label="Поделиться" style={at(328, 664, 44, 44, PRODUCT_A_H)} onClick={() => open('share')} />
             : <div style={{ position: 'absolute', ...at(330, 662, 45, 46, PRODUCT_A_H), background: '#fff' }} />}
         </div>
-        {STATE === 'active' && <div className="pad" style={{ margin: '8px 0 20px' }}><Banner104 onShare={() => open('share')} /></div>}
+        {/* Баннер сразу под «В корзину», над строкой «Удобная доставка» */}
+        {STATE === 'active' && <div className="pad" style={{ margin: '8px 0 4px' }}><Banner104 onShare={() => open('share')} /></div>}
+        <img className="slice" src="assets/product-a2.jpg" alt="" />
         {/* Полная продуктовая прода до футера, нарезана частями по 2000px, чтобы грузилась по мере прокрутки */}
         {[1, 2, 3, 4, 5, 6].map((i) => <img className="slice" key={i} src={`assets/product-b${i}.jpg`} alt="" loading={i > 1 ? 'lazy' : undefined} />)}
       </>
