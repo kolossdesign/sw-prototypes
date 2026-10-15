@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Реферальная программа · Siberian Wellness</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<style>
+  @font-face { font-family: 'Gerbera'; src: url(../assets/fonts/gerbera_light.woff2) format('woff2'); font-weight: 300; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gerbera'; src: url(../assets/fonts/gerbera_regular.woff2) format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gerbera'; src: url(../assets/fonts/gerbera_medium.woff2) format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gerbera'; src: url(../assets/fonts/gerbera_bold.woff2) format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gerbera'; src: url(../assets/fonts/gerbera_bold.woff2) format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Glober'; src: url(../assets/fonts/glober_book.woff) format('woff'); font-weight: 300; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Glober'; src: url(../assets/fonts/glober_regular.woff) format('woff'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Glober'; src: url(../assets/fonts/glober_semi-bold.woff) format('woff'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Glober'; src: url(../assets/fonts/glober_bold.woff) format('woff'); font-weight: 600; font-style: normal; font-display: swap; }
+  :root {
+    --brand: #00b0f0; --brand-d: #008cf7;
+    --navy: #0b276f; --navy-ink: #06112e;
+    --ink: #141414; --ink-2: #8b8d94; --line: #e1e2e4; --line-2: #ebecee;
+    --bg: #f6f6f8; --white: #fff;
+    --link: #1b8dbf; --cyan-link: #4dc6f4; --cyan-tint: #e2f6fd; --badge: #c7efff;
+    --green: #2db46b; --red: #ff453a;
+    --scrim: rgba(0, 0, 0, 0.4);
+  }
+  html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: var(--white); }
+  #root { height: 100%; }
+  .sw, .sw input, .sw button { font-family: 'Gerbera', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  .sw {
+    height: 100%; display: flex; flex-direction: column; position: relative;
+    width: 100%; background: var(--white); color: var(--ink);
+    font-size: 16px; -webkit-font-smoothing: antialiased; overflow: hidden;
+  }
+  .sw button { -webkit-tap-highlight-color: transparent; }
+  .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .slice { display: block; width: 100%; height: auto; }
+  .sliceWrap { position: relative; }
+  /* WHY: прод вставлен скриншотами, кликабельные места поверх — прозрачные хотспоты в css-пикселях 375-сетки */
+  .hot { position: absolute; background: transparent; border: none; padding: 0; cursor: pointer; }
+  .pad { padding: 0 16px; }
+
+  /* Баннер программы: фон из SVG макета, текст и монетки — живые слои.
+     WHY: высота от макета (140/104/60) — минимальная, ширина резиновая; монетки прибиты к правому краю */
+  .banner {
+    position: relative; display: flex; flex-direction: column; align-items: flex-start; width: 100%;
+    border: none; text-align: left; border-radius: 16px; overflow: hidden; cursor: pointer; color: #fff;
+    background: var(--navy); box-sizing: border-box; padding: 18px 16px 20px; isolation: isolate;
+  }
+  /* Размытый отсвет (пятна из SVG макета) — отдельным слоем, чтобы выезжал справа при появлении баннера */
+  .banner::before, .pHead::before {
+    content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: var(--glow) right center / cover no-repeat;
+    opacity: 0; transform: translateX(45%) scale(1.15);
+  }
+  .banner.is-in::before, .pHead::before { animation: glowIn 1.4s cubic-bezier(.2, .7, .2, 1) .15s forwards; }
+  @keyframes glowIn { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .banner::before, .pHead::before { animation: none !important; opacity: 1; transform: none; } }
+  .banner--140 { min-height: 140px; --glow: url(../assets/glow-banner-140.svg); }
+  .banner--104 { min-height: 104px; --glow: url(../assets/glow-banner-104.svg); }
+  .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; --glow: url(../assets/glow-menu-60.svg); }
+  .banner .coins { position: absolute; pointer-events: none; }
+  .banner--140 .coins { right: -26px; top: 7px; width: 127px; }
+  .banner--104 .coins { right: -26px; top: -11px; width: 127px; }
+  .banner--60  .coins { right: -1px; top: -7px; width: 110px; }
+  .bTitle, .bText, .bLink { position: relative; }
+  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 96px; }
+  .bText { margin-top: 8px; font-size: 14px; line-height: 18px; max-width: calc(100% - 96px); }
+  .banner--60 .bText { margin-top: 0; max-width: calc(100% - 100px); }
+  .banner--104 .bTitle { padding-right: 56px; }
+  .bLink { margin-top: auto; padding-top: 14px; font-size: 14px; color: var(--cyan-link); display: flex; align-items: center; gap: 8px; }
+  .bShare {
+    position: absolute; right: 16px; top: 20px; width: 40px; height: 40px; border-radius: 12px;
+    background: #fff; display: flex; align-items: center; justify-content: center; color: var(--navy-ink);
+  }
+
+  .cartBtn { position: absolute; border: none; border-radius: 4px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; padding: 0; }
+  .cartBtn:active { background: var(--brand-d); }
+
+  /* Таббар прода */
+  .tabbar { flex: 0 0 auto; height: 52px; display: flex; border-top: 1px solid var(--line-2); background: #fff; }
+  .tabbar button { flex: 1; background: none; border: none; display: flex; align-items: center; justify-content: center; color: var(--ink); cursor: pointer; padding: 0; }
+  .tabbar button.is-on { color: var(--brand); }
+
+  /* Шторки */
+  .scrim { position: absolute; inset: 0; background: var(--scrim); z-index: 20; display: flex; align-items: flex-end; animation: fade .2s ease; }
+  .sheet {
+    width: 100%; max-height: 92%; overflow-y: auto; background: #fff; border-radius: 16px 16px 0 0;
+    animation: up .25s ease; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  @keyframes up { from { transform: translateY(40px); opacity: .6; } to { transform: none; opacity: 1; } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .sheetClose { position: absolute; right: 16px; top: 20px; width: 32px; height: 32px; border: none; background: none; padding: 0; cursor: pointer; color: var(--ink-2); display: flex; align-items: center; justify-content: center; }
+  .sheetPlainHead { position: relative; height: 56px; }
+
+  /* Шапка программы в шторке */
+  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy); --glow: url(../assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
+  .pHead--ended { --glow: url(../assets/glow-sheet-196.svg); padding-top: 64px; }
+  .pHead .sheetClose { color: #fff; top: 20px; }
+  .pHead .coins { position: absolute; right: 10px; top: 49px; width: 88px; height: 88px; pointer-events: none; }
+  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 88px); }
+  .pHead--ended .pTitle { max-width: none; }
+  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; max-width: calc(100% - 70px); }
+  .pHead--ended .pText { max-width: none; }
+  .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
+  .pLinks button { background: none; border: none; padding: 0; color: var(--cyan-link); font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+  .badge { position: absolute; left: 16px; top: 24px; background: var(--badge); color: var(--navy-ink); font-size: 14px; font-weight: 500; line-height: 24px; padding: 0 8px; border-radius: 4px; }
+
+  .h1 { font-size: 24px; font-weight: 500; line-height: 30px; margin: 0; color: var(--navy-ink); }
+  .refs { padding: 24px 16px 8px; }
+  .info { display: flex; gap: 12px; align-items: flex-start; background: var(--cyan-tint); border-radius: 8px; padding: 14px 16px; margin: 20px 0 8px; font-size: 14px; line-height: 18px; }
+  .info i { flex: 0 0 20px; height: 20px; border-radius: 50%; background: var(--brand); color: #fff; font-style: normal; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: -1px; }
+  .row { display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: none; border-bottom: 1px solid var(--line); padding: 16px 0; text-align: left; cursor: pointer; color: inherit; }
+  .row:last-child { border-bottom: none; }
+  .row .t { flex: 1; font-size: 16px; line-height: 22px; font-weight: 500; }
+  .row .t--link { color: var(--link); }
+  .row .sub { display: block; font-size: 14px; line-height: 18px; color: var(--ink-2); font-weight: 400; margin-top: 4px; }
+  .row svg { flex: 0 0 auto; color: var(--ink); }
+
+  .share { padding: 24px 16px 8px; }
+  .apps { display: flex; gap: 12px; overflow-x: auto; margin: 20px -16px 0; padding: 0 16px 4px; scrollbar-width: none; }
+  .apps::-webkit-scrollbar { display: none; }
+  .app { flex: 0 0 auto; width: 64px; background: none; border: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 12px; color: var(--ink-2); }
+  .app span { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .linkBox { display: flex; gap: 4px; margin-top: 20px; }
+  .linkBox div { flex: 1; min-width: 0; height: 48px; border: 1px solid #c4c6cc; border-radius: 4px; display: flex; align-items: center; padding: 0 12px; font-size: 16px; white-space: nowrap; overflow: hidden; }
+  .linkBox b { color: var(--green); font-weight: 500; }
+  .refField { margin-top: 16px; }
+  .refLabel { font-size: 16px; font-weight: 500; line-height: 20px; color: var(--navy-ink); margin-bottom: 8px; }
+  .refField .linkBox { margin-top: 0; }
+  .refField .linkBox div { cursor: pointer; }
+  .refField .linkBox button { background: #4fadea; }
+  .lite .refField .linkBox button { background: var(--brand); }
+  .forClient { display: block; background: none; border: none; padding: 0; margin-top: 24px; color: var(--link); font-size: 14px; line-height: 18px; text-align: left; cursor: pointer; }
+  .forClientSub { margin: 6px 0 0; font-size: 14px; line-height: 18px; color: var(--ink-2); }
+  .linkBox button { flex: 0 0 48px; height: 48px; border: none; border-radius: 4px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .shareGrid { display: grid; grid-template-columns: repeat(6, 40px); justify-content: space-between; row-gap: 16px; margin-top: 24px; }
+  .shareItem { width: 40px; height: 40px; border-radius: 50%; border: none; padding: 8px; background: #c4c6cc; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .shareItem svg { width: 24px; height: 24px; display: block; }
+  .shareField { margin-top: 24px; height: 48px; border: 1px solid #c4c6cc; border-radius: 4px; display: flex; align-items: center; padding: 0 12px; font-size: 16px; white-space: nowrap; overflow: hidden; cursor: pointer; }
+  .shareField b { color: var(--green); font-weight: 500; }
+  .shareCopy { margin-top: 24px; height: 40px; }
+  .oldGrid { display: grid; grid-template-columns: repeat(6, 40px); justify-content: space-between; row-gap: 16px; margin-top: 16px; }
+  .oldGrid button { width: 40px; height: 40px; border-radius: 50%; border: none; background: #eef0f2; color: #8b8d94; font-size: 10px; font-weight: 700; cursor: pointer; }
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; height: 44px; border: none; border-radius: 4px; background: var(--brand); color: #fff; font-size: 16px; cursor: pointer; }
+  .btn--ghost { background: #fff; color: var(--ink); border: 1px solid #c4c6cc; }
+
+  .how { padding: 0 16px 16px; }
+  .step { display: flex; gap: 16px; align-items: flex-start; margin-top: 16px; font-size: 14px; line-height: 18px; }
+  .step i { flex: 0 0 28px; height: 28px; border-radius: 50%; background: #b3e8fb; font-style: normal; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .step i.emoji { background: none; font-size: 22px; }
+  .textLink { background: none; border: none; padding: 0; color: var(--link); font-size: 14px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-top: 24px; }
+
+  /* Тост «Ссылка скопирована» */
+  .toast {
+    position: absolute; left: 16px; right: 16px; top: calc(12px + env(safe-area-inset-top, 0px)); z-index: 40;
+    background: #2b2b2b; color: #fff; border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    font-size: 15px; animation: fade .2s ease; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  }
+  .toast i { flex: 0 0 20px; height: 20px; border-radius: 50%; background: #34c759; color: #fff; font-style: normal; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+
+  /* Меню профиля */
+  .menu { position: absolute; inset: 0; z-index: 25; background: #fff; overflow-y: auto; animation: fade .2s ease; }
+  .menuHead { position: relative; padding: 56px 16px 16px; }
+  .menuUser { display: flex; align-items: center; gap: 16px; }
+  .ava { width: 56px; height: 56px; border-radius: 50%; background: #c8c9cc; color: #fff; display: flex; align-items: center; justify-content: center; flex: 0 0 56px; }
+  .menuName { font-size: 20px; font-weight: 500; line-height: 24px; color: var(--navy-ink); }
+  .acc { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; font-size: 12px; font-weight: 500; color: var(--link); letter-spacing: .02em; }
+  .acc span { display: inline-flex; align-items: center; gap: 8px; }
+  .pill { background: var(--brand); color: #fff; border-radius: 10px; padding: 1px 8px; font-size: 12px; font-weight: 700; }
+  .infoDot { width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--ink-2); color: var(--ink-2); font-size: 11px; display: inline-flex; align-items: center; justify-content: center; }
+  .awards { display: flex; align-items: center; gap: 6px; background: var(--bg); padding: 12px 16px; font-size: 16px; color: var(--ink-2); }
+  .awards em { margin-right: 10px; font-style: normal; }
+  .award { width: 34px; height: 34px; border-radius: 50%; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .menuList { padding: 12px 16px 24px; }
+  .menuItem { display: block; width: 100%; text-align: left; background: none; border: none; padding: 10px 0; font-size: 16px; color: var(--ink); cursor: pointer; }
+  .menuList .banner { margin: 4px 0 6px; }
+  .menuDivider { height: 1px; background: var(--line); margin: 12px 0; }
+
+  /* Сенкью */
+  .thx { padding: 40px 16px 32px; }
+  .thx small { font-size: 14px; font-weight: 500; }
+  .thx h1 { font-size: 24px; font-weight: 500; line-height: 30px; margin: 8px 0 20px; }
+  .thx p { font-size: 14px; line-height: 20px; margin: 0 0 20px; }
+  .thx h2 { font-size: 18px; font-weight: 500; margin: 28px 0 16px; }
+  .addr { border: 1px solid #c4c6cc; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 20px; }
+  .addr b { font-size: 16px; font-weight: 500; display: block; margin-bottom: 12px; }
+  .addr .g { color: var(--ink-2); }
+  .thxGreen { background: #e3f8ec; border-radius: 8px; margin: 0 0 0; padding: 32px 16px 24px; text-align: center; font-size: 14px; line-height: 20px; }
+  .thxSoc { background: var(--bg); padding: 24px 16px; text-align: center; font-size: 14px; }
+  .soc { display: inline-flex; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: #fff; margin: 12px 6px 0; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+  .thxNews { background: #c7efff; padding: 32px 16px; font-size: 24px; font-weight: 500; line-height: 30px; }
+
+  /* Бонусы и кэшбэк */
+  .bonus { padding: 24px 16px 24px; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); margin: 20px 0 16px; }
+  .tabs button { flex: 1; background: none; border: none; border-bottom: 2px solid transparent; padding: 0 0 10px; font-size: 13px; font-weight: 500; letter-spacing: .03em; color: var(--ink-2); cursor: pointer; }
+  .tabs button.is-on { color: var(--ink); border-bottom-color: var(--ink); }
+  .muted { color: var(--ink-2); font-size: 14px; line-height: 20px; margin: 0 0 12px; }
+  .opHead { display: flex; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--ink-2); border-bottom: 1px solid var(--ink-2); padding: 12px 0 6px; }
+  .op { display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); padding: 12px 0; }
+  .op .n { font-size: 14px; line-height: 18px; }
+  .op .d { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+  .op .v { font-size: 15px; font-weight: 500; white-space: nowrap; }
+  .v--plus { color: var(--green); } .v--minus { color: var(--red); }
+  .pager { display: flex; justify-content: center; gap: 14px; align-items: center; margin-top: 20px; font-size: 14px; color: var(--ink-2); }
+  .pager b { background: var(--line-2); color: var(--ink); padding: 6px 10px; border-radius: 4px; font-weight: 500; }
+  .bal { display: flex; gap: 12px; margin-top: 4px; }
+  .bal div { flex: 1; background: var(--bg); border-radius: 12px; padding: 16px; font-size: 13px; color: var(--ink-2); }
+  .bal b { display: block; font-size: 22px; color: var(--ink); font-weight: 500; margin-top: 6px; }
+
+  /* Заглушка BackOffice / шапка внутренних экранов */
+  .topBack { display: flex; align-items: center; gap: 6px; background: #fff; border: none; border-bottom: 1px solid var(--line-2); width: 100%; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 14px; font-size: 16px; color: var(--link); cursor: pointer; text-align: left; }
+  .stub { padding: 40px 24px; text-align: center; color: var(--ink-2); font-size: 15px; line-height: 22px; }
+  .stub .h1 { margin-bottom: 12px; }
+  .stub .bo { display: inline-block; background: var(--navy); color: #fff; font-weight: 700; border-radius: 8px; padding: 8px 14px; margin-bottom: 20px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>window.__LITE__ = true;</script>
+<script type="text/babel">
+  /* global React, ReactDOM */
+  const { useState, useEffect, useRef } = React;
+
+  /* Тексты сняты с Figma «Flow TO BE» (12564:12137) и SVG-блоков баннеров */
+  const REF_NO = '4276762';
+  const REF_URL = 'https://…/507749/?referral=';
+  const T = {
+    bannerTitle: 'Бонусы за приглашения',
+    bannerText: 'Получите 10% с первого заказа приглашенного вами друга.',
+    bannerLink: 'Мои реферальные ссылки',
+    menuText: 'Получите 10% с первого заказа приглашенного вами друга.',
+    headTitle: 'Получите 10% с первого заказа приглашенного вами друга',
+    headActive: 'После регистрации по вашей ссылке',
+    headEnded: 'Для клиентов, зарегистрированных до завершения программы, условия сохраняются',
+    ended: 'Программа завершена',
+    how: 'Как это работает', history: 'История начислений', terms: 'Условия',
+    refsTitle: 'Мои реферальные ссылки:',
+    refsInfo: 'Все ссылки уже содержат ваш реферальный номер ',
+    copyRows: ['Страница, на которой вы находитесь', 'Регистрация Привилегированного клиента', 'Регистрация Бизнес-Партнера'],
+    bo: { t: 'Реферальные ссылки из BackOffice', s: 'Сформировать ссылку на требуемую страницу с возможностью выбора страны и языка, а также на промостраницы.' },
+    forClientShort: 'Регистрация за Клиента под вашим Рег. номером',
+    forClient: { t: 'Регистрация за Клиента под вашим Регистрационным номером', s: 'Введите данные Клиента при регистрации вместо него.' },
+    copied: 'Ссылка скопирована',
+    shareTitle: 'Поделиться',
+    howTitle: 'Как получить 10% с первого заказа приглашенного вами друга',
+    howSteps: ['Отправьте свою реферальную ссылку новому клиенту', 'Он должен оплатить первый заказ не позднее седьмого календарного дня после регистрации'],
+    howDone: 'Готово! 10% с первого заказа нового клиента ваши',
+    howTerms: 'Полные условия',
+  };
+  const HISTORY = [
+    { n: 'Бонус за приглашение · заказ №116343424', d: '27 дек 2025, Россия', v: '+ 100', plus: true },
+    { n: 'Отмена бонуса за приглашение · заказ №116343424', d: '27 нояб 2025, Россия · Возврат товара', v: '- 100' },
+    { n: 'Бонус за приглашение · заказ №116343423', d: '27 окт 2025, Россия', v: '+ 150', plus: true },
+    { n: 'Отмена бонуса за приглашение · заказ №116343423', d: '27 сент 2025, Россия · Платеж отменен', v: '- 150' },
+    { n: 'Списание за заказ №1163432424', d: '27 авг 2025, Россия', v: '- 9' },
+    { n: 'Бонусы за заказ №1163432411', d: '27 июля 2025, Россия', v: '+ 31', plus: true },
+    { n: 'Списание за заказ №1163432424', d: '27 июня 2025, Россия', v: '- 105' },
+    { n: 'За покупки друга', d: '27 апр 2025, Россия', v: '+ 31', plus: true },
+  ];
+
+  /* Сценарий теста задаётся ссылкой: ?state=active|ended|none&start=main|product|thanks */
+  const Q = new URLSearchParams(location.search);
+  /* Урезанный флоу (папка lite/): только «активна» / «неактивна», без истории начислений */
+  const LITE = window.__LITE__ === true;
+  const RAW_STATE = LITE && Q.get('state') === 'inactive' ? 'none' : Q.get('state');
+  const STATE = (LITE ? ['active', 'none'] : ['active', 'ended', 'none']).includes(RAW_STATE) ? RAW_STATE : 'active';
+  const START = ['main', 'product', 'thanks', 'bonus'].includes(Q.get('start')) ? Q.get('start') : 'main';
+
+  const Chevron = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M4 1.5 8.5 6 4 10.5" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" /></svg>
+  );
+  const Close = () => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 3l14 14M17 3 3 17" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" /></svg>
+  );
+  const CopyIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="9" height="9" rx="1.5" stroke="currentColor" /><path d="M3.5 11V4.5a1 1 0 0 1 1-1H11" stroke="currentColor" strokeLinecap="round" /></svg>
+  );
+  const ShareIcon = () => (
+    <svg width="24" height="24" viewBox="294 30 26 20" fill="none" aria-hidden="true"><path d="M309.095 36.2667C309.095 36.2667 296 34.6667 296 48C300.19 40 309.095 42.6667 309.095 42.6667V46.9333L318 39.4667L309.095 32V36.2667Z" stroke="currentColor" strokeLinejoin="round" /></svg>
+  );
+  const LinkIcon = () => (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+  );
+  const Snowflake = ({ color = 'currentColor', size = 24 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13.41 15.42 9.74 21.77H6.92L12 12.98l1.41 2.44Zm3.67 6.35h-2.82l-1.7-2.93 1.41-2.44 3.11 5.37ZM6.08 21.29l-1.41-2.45 1.69-2.93h2.82l-3.1 5.38Zm13.25-2.45-1.41 2.44-5.07-8.8h2.82l3.66 6.36ZM9.74 14.93H2.41L1 12.49h10.15l-1.41 2.44Zm11.85 0H18.2l-1.41-2.44H23l-1.41 2.44ZM11.16 11.51H8.33L4.67 5.16l1.41-2.44 5.08 8.79Zm-3.95 0H1l1.41-2.44h3.39l1.41 2.44Zm15.79 0H12.85l1.41-2.44h7.33L23 11.51ZM9.74 2.23 12 6.14l2.26-3.91h2.82L12 11.02 6.92 2.23h2.82Zm9.59 2.93-1.69 2.93h-2.82l3.1-5.37 1.41 2.44Z" fill={color} /></svg>
+  );
+  const PersonIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8.4" r="4.4" stroke="currentColor" /><path d="M2.5 20.5c1.9-3.2 5.5-5.3 9.5-5.3s7.6 2.1 9.5 5.3" stroke="currentColor" strokeLinecap="round" /></svg>
+  );
+  const BagIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.8 7h16.4l.8 13H3L3.8 7Z" stroke="currentColor" strokeLinejoin="round" /><path d="M9 8V5.5C9 3.6 10.3 2 12 2s3 1.6 3 3.5V8" stroke="currentColor" strokeLinecap="round" /></svg>
+  );
+  const CatalogIcon = () => (
+    <svg width="26" height="24" viewBox="0 0 26 24" fill="none" aria-hidden="true"><path d="M2 6h9M2 12h6M2 18h9" stroke="currentColor" strokeLinecap="round" /><circle cx="17" cy="11" r="5" stroke="currentColor" /><path d="m20.6 14.6 3.4 3.4" stroke="currentColor" strokeLinecap="round" /></svg>
+  );
+
+  /* WHY: слои прода тянутся по ширине экрана, поэтому хотспоты задаём в % от слоя (координаты сняты в сетке 375px) */
+  const at = (l, t, w, h, H) => ({ left: l / 3.75 + '%', top: (t / H) * 100 + '%', width: w / 3.75 + '%', height: (h / H) * 100 + '%' });
+  const PRODUCT_A_H = 713;
+
+  /* Анимация отсвета стартует, когда баннер впервые попал в экран, а не при загрузке страницы */
+  function useInView() {
+    const ref = useRef(null);
+    const [inView, setInView] = useState(false);
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !('IntersectionObserver' in window)) { setInView(true); return undefined; }
+      const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setInView(true); io.disconnect(); } }, { threshold: 0.6 });
+      io.observe(el);
+      return () => io.disconnect();
+    }, []);
+    return [ref, inView ? ' is-in' : ''];
+  }
+
+  function Coins({ className }) { return <img className={className || 'coins'} src="../assets/coins.png" alt="" />; }
+
+  /* Баннеры: 140 — главная и сенкью, 104 — продуктовая (с «поделиться»), 60 — пункт меню ЛК */
+  function Banner140({ onOpen }) {
+    const [ref, cls] = useInView();
+    return (
+      <button type="button" ref={ref} className={"banner banner--140" + cls} onClick={onOpen}>
+        <Coins />
+        <span className="bTitle">{T.bannerTitle}</span>
+        <span className="bText">{T.bannerText}</span>
+        <span className="bLink">{T.bannerLink} <Chevron /></span>
+      </button>
+    );
+  }
+  function Banner104({ onShare }) {
+    const [ref, cls] = useInView();
+    return (
+      <button type="button" ref={ref} className={"banner banner--104" + cls} onClick={onShare}>
+        <Coins />
+        <span className="bTitle">{T.bannerTitle}</span>
+        <span className="bText">{T.bannerText}</span>
+        <span className="bShare"><ShareIcon /></span>
+      </button>
+    );
+  }
+  function Banner60({ onOpen }) {
+    const [ref, cls] = useInView();
+    return (
+      <button type="button" ref={ref} className={"banner banner--60" + cls} onClick={onOpen}>
+        <Coins />
+        <span className="bText">{T.menuText}</span>
+      </button>
+    );
+  }
+
+  function TabBar({ on, go, openMenu }) {
+    return (
+      <nav className="tabbar">
+        <button type="button" aria-label="Главная" onClick={() => go('main')}><Snowflake color="#f2a07b" /></button>
+        <button type="button" aria-label="Каталог" onClick={() => go('main')}><CatalogIcon /></button>
+        <button type="button" aria-label="Профиль" className={on === 'profile' ? 'is-on' : ''} onClick={openMenu}><PersonIcon /></button>
+        <button type="button" aria-label="Корзина"><BagIcon /></button>
+      </nav>
+    );
+  }
+
+  /* ---------- Экраны ---------- */
+  /* Главная — живая вёрстка прода (снимок DOM+CSS), изолирована в shadow DOM, чтобы стили прода и прототипа не смешивались */
+  const PROD_FIX = `
+    :host { display: block; font-family: Gerbera, sans-serif; color: #141414; background: #fff; -webkit-text-size-adjust: 100%; }
+    .prod-root { overflow-x: hidden; }
+    .ref-slot { padding: 16px 16px 0; }
+    /* WHY: JS-слайдеров прода нет — превращаем их в нативный горизонтальный скролл со снапом */
+    .swiper-wrapper, .osn-slider__wrapper { transform: none !important; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    .swiper-wrapper::-webkit-scrollbar, .osn-slider__wrapper::-webkit-scrollbar { display: none; }
+    .swiper-slide, .osn-slider__slide { scroll-snap-align: start; flex-shrink: 0; }
+    /* JS прода сдвигал ленту товаров на 16px трансформом — возвращаем отступ паддингом */
+    .osn-slider__wrapper { padding: 0 16px; scroll-padding: 0 16px; box-sizing: border-box; }
+    [data-go] { cursor: pointer; }
+    /* Главный слайдер: JS прода выставлял ширину слайда 375px и высоту обёртки — делаем резиновым */
+    .im21--main-banner-slider .swiper-wrapper { height: auto !important; }
+    .im21--main-banner-slider .swiper-slide { width: 100% !important; }
+  `;
+  function ProdMain({ go, children }) {
+    const host = useRef(null);
+    useEffect(() => {
+      const el = host.current;
+      const root = el.shadowRoot || el.attachShadow({ mode: 'open' });
+      let alive = true;
+      fetch('../assets/main-prod.html').then((r) => r.text()).then((html) => {
+        if (!alive) return;
+        root.innerHTML = '<link rel="stylesheet" href="../assets/main-prod.css"><style>' + PROD_FIX + '</style>' + html;
+        // Точки главного слайдера следуют за свайпом, стартуем с первого слайда
+        const wrap = root.querySelector('.im21--main-banner-slider .swiper-wrapper');
+        const dots = [...root.querySelectorAll('.im21--main-banner-slider .im21--pagination__bullet')];
+        if (wrap && dots.length) {
+          const sync = () => {
+            const i = Math.round(wrap.scrollLeft / wrap.clientWidth);
+            dots.forEach((d, k) => d.classList.toggle('im21--pagination__bullet_active', k === i));
+          };
+          wrap.scrollLeft = 0; sync();
+          wrap.addEventListener('scroll', sync, { passive: true });
+        }
+      });
+      const onClick = (e) => {
+        const card = e.target.closest('[data-go]');
+        if (card) { e.preventDefault(); go(card.getAttribute('data-go')); return; }
+        if (e.target.closest('a')) e.preventDefault();
+      };
+      root.addEventListener('click', onClick);
+      return () => { alive = false; root.removeEventListener('click', onClick); };
+    }, []);
+    return <div ref={host}>{children}</div>;
+  }
+
+  function MainScreen({ open, go }) {
+    return (
+      <ProdMain go={go}>
+        {STATE === 'active' && <div slot="ref-banner"><Banner140 onOpen={() => open('refs')} /></div>}
+      </ProdMain>
+    );
+  }
+
+  function ProductScreen({ open, go }) {
+    return (
+      <>
+        <div className="sliceWrap">
+          <img className="slice" src="../assets/product-a.jpg" alt="" />
+          <button type="button" className="hot" aria-label="Главная" style={at(8, 56, 70, 28, PRODUCT_A_H)} onClick={() => go('main')} />
+          {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
+          {/* WHY: на мобилке CTA «В корзину» по макету 160px — растровую кнопку прода закрываем и рисуем свою */}
+          <div style={{ position: 'absolute', ...at(14, 663, 316, 44, PRODUCT_A_H), background: '#fff' }} />
+          <button type="button" className="cartBtn" style={{ ...at(16, 665, 0, 40, PRODUCT_A_H), width: 160 }} onClick={() => go('thanks')}>В корзину</button>
+          {/* WHY: пока программа активна, «Поделиться» живёт в баннере — иконку прода у CTA закрываем белой плашкой; после завершения — дефолт прода */}
+          {STATE !== 'active'
+            ? <button type="button" className="hot" aria-label="Поделиться" style={at(328, 664, 44, 44, PRODUCT_A_H)} onClick={() => open('share')} />
+            : <div style={{ position: 'absolute', ...at(330, 662, 45, 46, PRODUCT_A_H), background: '#fff' }} />}
+        </div>
+        {/* Баннер сразу под «В корзину», над строкой «Удобная доставка» */}
+        {STATE === 'active' && <div className="pad" style={{ margin: '8px 0 4px' }}><Banner104 onShare={() => open('share')} /></div>}
+        <img className="slice" src="../assets/product-a2.jpg" alt="" />
+        {/* Полная продуктовая прода до футера, нарезана частями по 2000px, чтобы грузилась по мере прокрутки */}
+        {[1, 2, 3, 4, 5, 6].map((i) => <img className="slice" key={i} src={`../assets/product-b${i}.jpg`} alt="" loading={i > 1 ? 'lazy' : undefined} />)}
+      </>
+    );
+  }
+
+  function ThanksScreen({ open }) {
+    return (
+      <>
+        <div className="thx">
+          <small>Поздравляем</small>
+          <h1>Оплата успешно принята. Заказ передан в обработку.</h1>
+          <p>Номер заказа 1234344945. Вы можете отслеживать статус заказа в личном кабинете.</p>
+          <button type="button" className="btn">Проверить заказ</button>
+          <h2>Вы можете забрать заказ по адресу:</h2>
+          <div className="addr">
+            <b>улица Череповецкая, д. 12</b>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Snowflake color="#00b0f0" size={18} /> Магазин SIBERIAN WELLNESS</div>
+            <div className="g" style={{ marginTop: 6 }}>Отделение службы доставки</div>
+            <div style={{ color: '#e5483d', marginTop: 6 }}>Ⓜ Тропарево</div>
+            <div style={{ marginTop: 14 }}>телефон +7(800)250-44-34</div>
+            <div className="g" style={{ marginTop: 6 }}>пн, открыто: 09:00 - 22:00 вт, открыто: 09:00 - 22:00 ср, открыто: 09:00 - 22:00 чт, открыто: 09:00 - 22:00 пт, открыто: 09:00 - 22:00 сб, открыто: 09:00 - 22:00 вс, открыто: 09:00 - 22:00</div>
+          </div>
+          {STATE === 'active' && <div style={{ marginTop: 24 }}><Banner140 onOpen={() => open('refs')} /></div>}
+        </div>
+        <div style={{ background: 'var(--bg)', padding: '24px 0 0' }}>
+          <div className="thxGreen" style={{ margin: '0 0' }}>
+            Спасибо, что выбрали Siberian Wellness! Мы берем лучшее от природы и создаем уникальные решения для комфортной жизни каждого человека. Помогите нам сохранить планету такой же красивой и удивительной – присоединяйтесь к нашему благотворительному фонду <span style={{ color: 'var(--link)' }}>“Мир вокруг тебя”</span>. Вместе мы можем все!
+            <button type="button" className="btn btn--ghost" style={{ marginTop: 20 }}>Подробнее</button>
+          </div>
+          <div className="thxSoc">Присоединяйтесь к нам:<br /><span className="soc">VK</span><span className="soc">OK</span><span className="soc">YT</span></div>
+          <div className="thxNews">Узнавай о новинках<br />и проектах компании</div>
+        </div>
+      </>
+    );
+  }
+
+  function BonusScreen() {
+    const [tab, setTab] = useState('history');
+    return (
+      <div className="bonus">
+        <h1 className="h1">Бонусы и кэшбэк</h1>
+        <div className="tabs">
+          <button type="button" className={tab === 'main' ? 'is-on' : ''} onClick={() => setTab('main')}>БОНУСЫ И КЭШБЭК</button>
+          <button type="button" className={tab === 'history' ? 'is-on' : ''} onClick={() => setTab('history')}>ИСТОРИЯ БОНУСОВ</button>
+        </div>
+        {tab === 'main' ? (
+          <div className="bal"><div>Бонусный счет<b>152 ₽</b></div><div>Кэшбэк<b>0%</b></div></div>
+        ) : (
+          <>
+            <p className="muted">Бонусы начисляются на следующий день после оплаты заказа.</p>
+            <p className="muted">Все поступления и траты бонусов отображаются в валюте текущей страны доставки вне зависимости от того, в какой валюте оплачен заказ.</p>
+            <div className="opHead"><span>Операция</span><span>Баланс, ₽</span></div>
+            {HISTORY.map((o, i) => (
+              <div className="op" key={i}>
+                <div><div className="n">{o.n}</div><div className="d">{o.d}</div></div>
+                <div className={'v ' + (o.plus ? 'v--plus' : 'v--minus')}>{o.v}</div>
+              </div>
+            ))}
+            <div className="pager"><span>‹</span><b>1</b><span>…</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>…</span><span>›</span></div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  function BoStub({ title, back }) {
+    return (
+      <>
+        <button type="button" className="topBack" onClick={back}><span style={{ fontSize: 20 }}>‹</span> Назад</button>
+        <div className="stub">
+          <span className="bo">BackOffice</span>
+          <h1 className="h1">{title}</h1>
+          <p>Здесь открывается страница BackOffice в этом же окне. В прототипе она не реализована.</p>
+        </div>
+      </>
+    );
+  }
+
+  /* ---------- Шторки ---------- */
+  function ProgramHead({ onClose, go }) {
+    if (STATE === 'none') return <div className="sheetPlainHead"><button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button></div>;
+    const ended = STATE === 'ended';
+    return (
+      <div className={'pHead' + (ended ? ' pHead--ended' : '')}>
+        {ended ? <span className="badge">{T.ended}</span> : <Coins />}
+        <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
+        <div className="pTitle">{T.headTitle}</div>
+        <div className="pText">{ended ? T.headEnded : T.headActive}</div>
+        <div className="pLinks">
+          {ended
+            ? <button type="button" onClick={() => go('bo', 'Условия программы')}>{T.terms} <Chevron /></button>
+            : <button type="button" onClick={() => go('how')}>{T.how} <Chevron /></button>}
+          {!LITE && <button type="button" onClick={() => go('bonus')}>{T.history} <Chevron /></button>}
+        </div>
+      </div>
+    );
+  }
+
+  /* Поле со ссылкой: клик по полю или кнопке выделяет ссылку, копирует её и показывает тост */
+  const REF_LINKS = [
+    { label: 'Страница, которой вы делитесь', url: 'https://ru.siberianhealth.com/ru/shop/catalog/product/501671/?referral=' },
+    { label: 'Регистрация Привилегированного клиента', url: 'https://ru.siberianhealth.com/ru/shop/user/registration/PRIVILEGED_CLIENT/?referral=' },
+    { label: 'Регистрация Бизнес-Партнера', url: 'https://ru.siberianhealth.com/ru/shop/user/registration/CONSULTANT/?referral=' },
+  ];
+  function RefField({ link, copy }) {
+    const box = useRef(null);
+    const pick = () => {
+      const sel = window.getSelection();
+      if (sel && box.current) sel.selectAllChildren(box.current);
+      copy(link.url + REF_NO);
+    };
+    return (
+      <div className="refField">
+        <div className="refLabel">{link.label}</div>
+        <div className="linkBox">
+          <div ref={box} onClick={pick}>{REF_URL}<b>{REF_NO}</b></div>
+          <button type="button" aria-label="Скопировать ссылку" onClick={pick}><LinkIcon /></button>
+        </div>
+      </div>
+    );
+  }
+
+  function RefsSheet({ onClose, go, copy }) {
+    return (
+      <>
+        <ProgramHead onClose={onClose} go={go} />
+        <div className="refs" style={STATE === 'none' ? { paddingTop: 0 } : null}>
+          <h2 className="h1">{T.refsTitle}</h2>
+          {LITE && STATE === 'none' ? (
+            /* Неактивная программа в урезанном флоу — список ссылок как сейчас на проде */
+            <>
+              <div className="info"><i>i</i><span>{T.refsInfo}<b>{REF_NO}</b></span></div>
+              {REF_LINKS.map((l, k) => (
+                <button type="button" className="row" key={l.label} onClick={() => copy(l.url + REF_NO)}><span className="t t--link">{T.copyRows[k]}</span><CopyIcon /></button>
+              ))}
+              <button type="button" className="row" onClick={() => go('reg')}>
+                <span className="t">{T.forClient.t}<span className="sub">{T.forClient.s}</span></span><Chevron size={14} />
+              </button>
+            </>
+          ) : <>
+          {REF_LINKS.map((l) => <RefField key={l.label} link={l} copy={copy} />)}
+          <button type="button" className="forClient" onClick={() => go('reg')}>{T.forClientShort}</button>
+          <p className="forClientSub">{T.forClient.s}</p>
+          </>}
+        </div>
+      </>
+    );
+  }
+
+  /* Иконки соцсетей сняты с попапа «Поделиться» прода (os-share-group) */
+  const SHARE_ICONS = ["<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M6.667 7.333c0-.368.298-.666.666-.666H8c.368 0 .667.298.667.666V8A.667.667 0 0 1 8 8.667h-.667A.667.667 0 0 1 6.667 8v-.667Z\" fill=\"currentColor\"></path> <path clip-rule=\"evenodd\" d=\"M6 4a2 2 0 0 0-2 2v3.333a2 2 0 0 0 2 2h3.333a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6Zm3.333 1.333H6A.667.667 0 0 0 5.333 6v3.333c0 .369.299.667.667.667h3.333A.667.667 0 0 0 10 9.333V6a.667.667 0 0 0-.667-.667ZM4 14.667a2 2 0 0 1 2-2h3.333a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3.333ZM6 14h3.333c.369 0 .667.299.667.667V18a.667.667 0 0 1-.667.667H6A.667.667 0 0 1 5.333 18v-3.333c0-.368.299-.667.667-.667ZM14.667 4a2 2 0 0 0-2 2v3.333a2 2 0 0 0 2 2H18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.333ZM18 5.333h-3.333A.667.667 0 0 0 14 6v3.333c0 .369.299.667.667.667H18a.667.667 0 0 0 .667-.667V6A.667.667 0 0 0 18 5.333Z\" fill=\"currentColor\" fill-rule=\"evenodd\"></path> <path d=\"M13.333 12.667a.667.667 0 0 0-.666.666V14c0 .368.298.667.666.667H14a.667.667 0 0 0 .667-.667v-.667a.667.667 0 0 0-.667-.666h-.667ZM13.333 18a.667.667 0 0 0-.666.667v.666c0 .369.298.667.666.667H14a.667.667 0 0 0 .667-.667v-.666A.667.667 0 0 0 14 18h-.667ZM15.333 16c0-.368.299-.667.667-.667h.667c.368 0 .666.299.666.667v.667a.667.667 0 0 1-.666.666H16a.667.667 0 0 1-.667-.666V16ZM18.667 12.667a.667.667 0 0 0-.667.666V14c0 .368.299.667.667.667h.666A.667.667 0 0 0 20 14v-.667a.667.667 0 0 0-.667-.666h-.666ZM18 18.667c0-.369.299-.667.667-.667h.666c.369 0 .667.299.667.667v.666a.667.667 0 0 1-.667.667h-.666a.667.667 0 0 1-.667-.667v-.666Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path clip-rule=\"evenodd\" d=\"M8.602 6.774c.136-.15.205-.298.409-.372.204-.15.477-.223.75-.297 1.02-.15 2.11-.15 3.132.074.477.074.681.297.75.818.068.372 0 .743 0 1.115v2.826c0 .223.068.37.136.594.136.372.408.446.68.15.341-.298.614-.67.818-.968.75-1.115 1.294-2.23 1.771-3.494.204-.52.273-.595.817-.595h3.202c.68 0 .885.372.613.967-.34.743-.75 1.487-1.226 2.156-.477.743-1.09 1.487-1.567 2.305-.068.074-.136.223-.204.297-.205.372-.205.744.068 1.04.272.373.613.67.953 1.042.545.595 1.09 1.19 1.635 1.859.204.223.273.446.409.743.136.372 0 .67-.34.818-.273.075-.614.149-.886.149h-2.384c-.545 0-1.022-.297-1.43-.67-.477-.445-.818-.966-1.295-1.412l-.476-.52c-.41-.298-.818-.223-1.022.223-.136.37-.204.892-.34 1.264v.074c0 .744-.205.967-.954.967-.818 0-1.635 0-2.452-.223-1.499-.447-2.725-1.34-3.746-2.603-1.363-1.635-2.384-3.57-3.338-5.502a28.086 28.086 0 0 1-.953-2.082c-.273-.67-.137-.892.544-.892h2.52c.545 0 .818.149 1.022.67.613 1.412 1.294 2.825 2.18 4.089.136.148.272.297.477.446.272.223.545.148.68-.223.137-.372.205-.67.205-1.041 0-.818 0-1.636-.068-2.454-.068-.595-.409-1.04-1.022-1.115h-.136c.068-.15.068-.15.068-.223Z\" fill=\"currentColor\" fill-rule=\"evenodd\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path clip-rule=\"evenodd\" d=\"M16.817 13.436c-.386-.726-1.158-.887-1.93-.484-.386.161-.771.403-1.158.564-1.621.564-3.164.242-4.708-.564-.695-.403-1.544-.08-1.853.484-.385.644-.078 1.53.618 1.933.694.403 1.389.645 2.084 1.048l-.694.725c-.464.484-1.005.967-1.467 1.45-.463.484-.54 1.048-.232 1.692.309.564.849.806 1.467.645.385-.08.772-.322 1.08-.645.617-.644 1.235-1.37 2.007-2.175.85.886 1.467 1.692 2.161 2.337.695.725 1.545.725 2.162.08.54-.564.463-1.45-.232-2.095-.694-.644-1.312-1.29-2.006-2.014.77-.322 1.466-.564 2.083-.967.772-.483 1.003-1.29.618-2.014Zm-4.94-.645c2.546 0 4.554-1.934 4.554-4.35 0-2.499-1.93-4.433-4.4-4.433-2.47-.16-4.63 2.015-4.554 4.432 0 2.417 2.007 4.351 4.4 4.351Zm.078-6.043c.848 0 1.697.806 1.62 1.692 0 .886-.771 1.612-1.698 1.612-.927 0-1.621-.806-1.621-1.693 0-.805.85-1.61 1.699-1.61Z\" fill=\"currentColor\" fill-rule=\"evenodd\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path clip-rule=\"evenodd\" d=\"M14.352 11.5c-.001.678-.278 1.328-.77 1.807-.492.48-1.16.75-1.855.75-.696 0-1.364-.27-1.856-.75a2.527 2.527 0 0 1-.77-1.807c.001-.678.278-1.328.77-1.807a2.664 2.664 0 0 1 1.856-.75c.696 0 1.363.27 1.855.75s.769 1.13.77 1.807ZM11.754 3c4.8.015 8.7 3.822 8.7 8.5 0 .664-.057 1.201-.186 1.74v.01c0 .001-.064.25-.1.359-.215.672-.605 1.231-1.128 1.618a3.002 3.002 0 0 1-2.005.573 2.89 2.89 0 0 1-1.245-.384c-.378-.22-.699-.524-.936-.886a4.388 4.388 0 0 1-1.432.942 4.48 4.48 0 0 1-1.695.328c-2.434 0-4.415-1.93-4.415-4.3s1.981-4.3 4.415-4.3c2.433 0 4.414 1.93 4.414 4.3v1.386c.003.809.56 1.14 1.037 1.177.473.035 1.103-.234 1.323-1.11a6.6 6.6 0 0 0 .164-1.453 6.678 6.678 0 0 0-2.035-4.776 7.04 7.04 0 0 0-4.903-1.981 7.04 7.04 0 0 0-4.903 1.981A6.677 6.677 0 0 0 4.789 11.5a6.677 6.677 0 0 0 2.035 4.776 7.04 7.04 0 0 0 4.903 1.981c1.331 0 2.626-.37 3.745-1.071l.02-.013 1.175 1.332-.025.017A8.838 8.838 0 0 1 11.727 20C6.915 20 3 16.187 3 11.5 3 6.813 6.915 3 11.727 3h.027Z\" fill=\"currentColor\" fill-rule=\"evenodd\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M21 12.281c0 4.574-3.736 8.281-8.345 8.281a8.36 8.36 0 0 1-4.035-1.03L4 21l1.506-4.443a8.194 8.194 0 0 1-1.197-4.276C4.309 7.708 8.045 4 12.655 4 17.265 4 21 7.708 21 12.281Zm-3.894 2.072c-.053-.085-.192-.136-.4-.238-.21-.102-1.239-.596-1.43-.664-.191-.068-.331-.102-.47.102-.14.205-.54.664-.663.8-.122.136-.244.154-.453.051-.209-.102-.883-.317-1.682-1.012a6.165 6.165 0 0 1-1.163-1.413c-.122-.204-.013-.314.092-.416.094-.091.21-.238.314-.357.104-.12.14-.204.208-.34.07-.137.036-.256-.017-.358-.052-.102-.47-1.106-.645-1.514-.174-.409-.348-.34-.47-.34s-.262-.018-.401-.018a.778.778 0 0 0-.558.256c-.192.204-.732.697-.732 1.701s.75 1.974.854 2.11c.105.136 1.447 2.263 3.573 3.08 2.126.816 2.126.544 2.51.51.382-.034 1.236-.494 1.411-.97.174-.477.174-.885.122-.97Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path clip-rule=\"evenodd\" d=\"M6.403 21v-3.206C4.326 16.266 3 13.939 3 11.333 3 6.73 7.137 3 12.24 3c5.103 0 9.24 3.731 9.24 8.333 0 4.603-4.137 8.333-9.24 8.333-.952 0-1.87-.13-2.736-.37L6.404 21Zm-.323-7 5.176-5 2.485 2.317L18.4 9l-5.148 5-2.46-2.358L6.08 14Z\" fill=\"currentColor\" fill-rule=\"evenodd\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M21.387 10.345c-.03-.307-.154-.545-.375-.715-.221-.17-.52-.254-.9-.254-.257 0-.474.038-.651.114a.92.92 0 0 0-.408.308.763.763 0 0 0-.138.448c-.005.14.023.261.083.365.063.104.15.194.259.27.11.073.235.138.379.194a3.8 3.8 0 0 0 .458.136l.67.168c.326.076.624.177.896.304.272.126.507.282.706.467.2.185.354.403.463.654.111.25.169.538.171.862-.002.477-.119.89-.35 1.24-.228.347-.558.616-.99.809-.43.19-.948.285-1.555.285-.602 0-1.126-.096-1.573-.289a2.323 2.323 0 0 1-1.041-.855c-.248-.38-.378-.85-.39-1.41h1.526c.017.261.088.479.215.654.128.172.3.303.513.391.216.086.46.13.732.13.267 0 .499-.041.695-.122.2-.081.354-.194.463-.338a.803.803 0 0 0 .164-.498.664.664 0 0 0-.15-.441c-.097-.12-.24-.22-.43-.304a4.245 4.245 0 0 0-.687-.228l-.812-.213c-.629-.16-1.125-.41-1.49-.749-.364-.34-.544-.797-.542-1.372a2.102 2.102 0 0 1 .36-1.235 2.452 2.452 0 0 1 1.009-.825A3.43 3.43 0 0 1 20.123 8c.554 0 1.037.099 1.45.296.415.198.738.473.968.825.23.352.35.76.357 1.224h-1.511ZM7.96 8.106h1.944l2.053 5.23h.088l2.053-5.23h1.945v7.784h-1.53v-5.066h-.062l-1.93 5.028h-1.04l-1.93-5.047h-.063v5.085H7.96V8.106ZM5.286 10.345c-.03-.307-.154-.545-.375-.715-.221-.17-.521-.254-.9-.254-.257 0-.474.038-.652.114a.92.92 0 0 0-.407.308.763.763 0 0 0-.139.448c-.005.14.023.261.084.365.063.104.15.194.259.27.109.073.235.138.378.194a3.8 3.8 0 0 0 .46.136l.669.168c.325.076.624.177.896.304.272.126.507.282.706.467.2.185.353.403.463.654.111.25.168.538.17.862-.002.477-.118.89-.349 1.24-.228.347-.558.616-.99.809-.43.19-.948.285-1.555.285-.602 0-1.126-.096-1.573-.289a2.323 2.323 0 0 1-1.041-.855c-.248-.38-.378-.85-.39-1.41h1.526c.017.261.088.479.214.654.13.172.3.303.514.391.216.086.46.13.732.13.267 0 .499-.041.695-.122.2-.081.353-.194.463-.338a.803.803 0 0 0 .164-.498.664.664 0 0 0-.15-.441c-.097-.12-.24-.22-.43-.304a4.24 4.24 0 0 0-.688-.228l-.812-.213c-.628-.16-1.125-.41-1.489-.749-.364-.34-.545-.797-.542-1.372a2.103 2.103 0 0 1 .36-1.235 2.451 2.451 0 0 1 1.009-.825A3.431 3.431 0 0 1 4.022 8c.554 0 1.037.099 1.45.296.414.198.737.473.968.825.23.352.35.76.357 1.224H5.286Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M5.265 6.709c-.46-.39-.356-.709.23-.709h13.01c.586 0 .69.32.229.709L12.97 11.6c-.261.222-.621.32-.97.302-.35.018-.71-.08-.972-.302L5.265 6.709Zm13.885 1.29c.467-.38.85-.176.85.453v8.405c0 .629-.48 1.143-1.067 1.143H5.067C4.48 18 4 17.486 4 16.857V8.452c0-.629.383-.832.85-.453l6.3 5.123c.235.19.543.282.85.278.308.004.617-.088.852-.278L19.15 8v-.001Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M7.583 5.333h9.034V8h1.13V5.333c0-.735-.506-1.333-1.13-1.333H7.583c-.624 0-1.13.598-1.13 1.333V8h1.13V5.333ZM19.736 8H4.465c-.603 0-1.092.486-1.092 1.083V14.5c0 .599.489 1.083 1.092 1.083h2.181v4.334c0 .599.489 1.083 1.09 1.083h8.727c.603 0 1.092-.484 1.092-1.083v-4.334h2.181c.603 0 1.09-.484 1.09-1.083V9.083c0-.597-.487-1.083-1.09-1.083Zm-3.273 11.917H7.737v-7.584h8.726v7.584Zm2.182-8.667a1.127 1.127 0 0 1-.776-.321 1.07 1.07 0 0 1-.314-.762c0-.598.487-1.084 1.09-1.084.603 0 1.091.486 1.091 1.084 0 .598-.488 1.083-1.091 1.083Z\" fill=\"currentColor\"></path> <path d=\"M8.507 14h4.106v1H8.507v-1Zm0 2h6.16v1h-6.16v-1Zm0 1h6.16v1h-6.16v-1Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M17.569 15.254c-1.667-.095-3.358-.173-5.02-.322-.24-.02-.349-.356-.148-.467a.19.19 0 0 1 .06-.12c.726-.698 1.758-1.132 2.551-1.79.45-.367.894-.74 1.339-1.11.092-.075.643-.55 1.003-.77-3.193-.752-6.135-.768-9.371-.47.125.05.246.094.376.127.547.14 1.126.211 1.684.306.68.12 1.364.223 2.052.314.357.046.798.02 1.112.215a.459.459 0 0 1 0 .777c-.512.93-1.548 1.57-2.392 2.186-.78.566-1.55 1.124-2.287 1.728 2.619 1.074 6.237-.013 9.07-.013.151 0 .297 0 .44.01.24.011.387.226.387.433a.344.344 0 0 1-.072.22c.034 1.648.281 3.24.743 4.821.075.26-.092.51-.34.591-1.057.352-2.493-1.17-3.308-1.715-1.087-.723-2.199-1.434-3.226-2.248-.723.77-1.63 1.418-2.452 2.038-1.041.78-2.179 1.67-3.459 1.996-.138.037-.246-.042-.293-.15-.113-.036-.206-.127-.202-.272.084-2.343.404-4.943.986-7.257-1.745-1.07-3.235-2.595-4.662-4.03-.257-.26-.147-.727.223-.822a38.83 38.83 0 0 1 6.84-1.116c.567-2.116 1.62-4.16 2.607-6.104.16-.31.708-.33.86 0 .961 2.083 2.115 4.063 3.122 6.117.72.03 1.423.243 2.141.38 1.364.256 2.737.446 4.122.57.559.054.63.818.205.967 0 .004 0 .01-.004.013-.751.95-1.704 1.79-2.564 2.645-.508.508-1.058 1.28-1.746 1.6.017.144.033.29.033.433 0 .12-.087.207-.193.236a.41.41 0 0 1-.197.053h-.02Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M8.468 7.432C8.288 7.144 8.062 7 7.787 7H5.32c-.159 0-.267.048-.33.144-.076.096-.072.215.01.355l1.661 2.68c.008.006.008.01 0 .01l-2.61 4.301c-.07.122-.07.237 0 .346.068.109.175.163.32.163h2.466c.26 0 .485-.147.67-.442l2.652-4.377-1.692-2.748Zm10.868-3.866c.086-.152.086-.287 0-.403-.071-.108-.192-.163-.365-.163h-2.835c-.307 0-.558.163-.754.49L9.134 13.74l3.988 6.77c.19.326.448.489.777.489h2.813c.172 0 .298-.055.376-.163.078-.124.074-.258-.012-.403l-3.953-6.693v-.01l6.212-10.165v.001Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M10.816 9.047V4c-1.257.2-2.447.69-3.472 1.426A7.97 7.97 0 0 0 4.892 8.23 7.679 7.679 0 0 0 4 11.867c0 1.942.645 3.66 1.933 5.15 1.454-.686 2.63-1.749 3.532-3.189.9-1.44 1.351-3.033 1.351-4.781Zm8.701-.817a7.967 7.967 0 0 0-2.451-2.805A8.158 8.158 0 0 0 13.593 4v5.047c0 1.748.452 3.342 1.352 4.781.9 1.44 2.078 2.503 3.531 3.19 1.29-1.492 1.933-3.209 1.933-5.151 0-1.297-.297-2.51-.892-3.637Zm-5.928 8.434a7.175 7.175 0 0 1-1.417-2.789c-.24 1-.71 1.929-1.404 2.789a9.773 9.773 0 0 1-2.515 2.195c1.199.647 2.548.984 3.92.978a8.202 8.202 0 0 0 3.932-.978 9.778 9.778 0 0 1-2.516-2.195Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M18.132 12.079a5.345 5.345 0 0 0-1.218-.527 4.287 4.287 0 0 1-.2-.068.614.614 0 0 1-.142-.084c-.056-.041-.075-.088-.054-.14.02-.052.037-.127.053-.224.355-.86.355-1.526 0-1.997-.363-.457-.965-.685-1.81-.685-.842 0-1.812.22-2.907.662l-.072.023c-.052.016-.105.03-.16.039a.531.531 0 0 1-.17.005.149.149 0 0 1-.119-.078c-.023-.045-.02-.12.013-.224.354-1.085.275-1.867-.236-2.345-.585-.554-1.556-.58-2.916-.079-1.36.501-2.705 1.384-4.037 2.648-1.01.957-1.787 1.922-2.336 2.895-.547.972-.821 1.888-.821 2.748 0 .808.257 1.554.768 2.239.513.684 1.189 1.249 2.029 1.694.838.445 1.786.793 2.844 1.043 1.055.25 2.14.376 3.25.376 1.112 0 2.178-.116 3.198-.348 1.02-.232 1.912-.542 2.672-.93a9.975 9.975 0 0 0 1.992-1.32c.568-.49.998-1.001 1.29-1.536.291-.535.437-1.057.437-1.565 0-.479-.134-.915-.402-1.307a3.026 3.026 0 0 0-.946-.915Zm-3.86 5.145c-1.155.886-2.611 1.415-4.369 1.587-1.15.105-2.233.026-3.245-.235-1.013-.262-1.835-.67-2.465-1.223-.631-.554-.982-1.19-1.052-1.908-.111-1.092.41-2.081 1.566-2.967 1.154-.887 2.611-1.416 4.369-1.588 1.15-.105 2.232-.026 3.244.236 1.013.261 1.836.669 2.466 1.222.63.554.982 1.19 1.052 1.908.11 1.092-.411 2.081-1.566 2.968Z\" fill=\"currentColor\"></path> <path d=\"M10.317 13.1a3.646 3.646 0 0 0-2.274.191c-.753.309-1.298.774-1.637 1.398-.338.636-.362 1.264-.07 1.884.291.62.823 1.044 1.594 1.272.799.241 1.606.201 2.42-.12.814-.323 1.383-.825 1.707-1.509.324-.67.315-1.308-.027-1.915-.342-.606-.913-1.007-1.713-1.201Zm-1.156 3.257c-.162.23-.4.4-.676.478-.291.09-.56.082-.804-.025a.782.782 0 0 1-.294-.2.756.756 0 0 1-.17-.308c-.065-.231-.019-.46.14-.689a1.18 1.18 0 0 1 .648-.462c.281-.087.544-.084.788.01.253.1.415.268.487.503.072.234.033.465-.119.693Zm1.016-1.216a.418.418 0 0 1-.238.186.48.48 0 0 1-.313.005c-.216-.094-.263-.245-.14-.452a.418.418 0 0 1 .231-.187.463.463 0 0 1 .308-.005.29.29 0 0 1 .189.186c.033.09.022.18-.037.267ZM19 10.624a.723.723 0 0 0 .43.344.778.778 0 0 0 .56-.046.713.713 0 0 0 .372-.397c.16-.435.188-.892.082-1.37a2.594 2.594 0 0 0-.687-1.265 2.84 2.84 0 0 0-1.273-.763 3.111 3.111 0 0 0-1.499-.064.713.713 0 0 0-.467.297.638.638 0 0 0-.1.519c.033.186.138.33.315.431.17.1.372.133.566.093.53-.1.98.035 1.35.408.369.373.47.805.302 1.294a.622.622 0 0 0 .05.519Z\" fill=\"currentColor\"></path> <path d=\"M22.445 9.106c-.195-1.136-.622-2.135-1.285-2.996-.663-.871-1.454-1.475-2.376-1.812a4.66 4.66 0 0 0-2.786-.155.786.786 0 0 0-.497.398c-.118.21-.154.442-.108.693.033.23.155.44.342.586.183.14.38.182.594.128a3.347 3.347 0 0 1 1.976.114c.654.238 1.218.667 1.69 1.286.473.611.776 1.32.914 2.128.137.808.099 1.58-.115 2.316-.06.243-.04.476.058.7a.808.808 0 0 0 .456.459c.206.08.404.062.594-.054a.883.883 0 0 0 .389-.539c.297-1.032.348-2.117.154-3.252Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M20.996 12.75A8.5 8.5 0 0 0 12.373 4C7.72 4.07 3.965 7.914 4 12.568a8.5 8.5 0 0 0 4.788 7.582.24.24 0 0 0 .344-.225c-.02-.547-.003-1.131.107-1.601.107-.463.53-2.253.808-3.428.137-.572.151-1.167.043-1.745a3.563 3.563 0 0 1-.062-.66c0-1.256.728-2.194 1.635-2.194.77 0 1.143.579 1.143 1.273 0 .775-.494 1.934-.748 3.008-.213.9.45 1.633 1.338 1.633 1.605 0 2.84-1.694 2.84-4.138 0-2.163-1.555-3.676-3.774-3.676-2.57 0-4.08 1.929-4.08 3.92 0 .778.3 1.61.673 2.063a.27.27 0 0 1 .062.26c-.068.285-.22.899-.25 1.024-.04.166-.132.2-.303.12-1.128-.524-1.834-2.174-1.834-3.5 0-2.85 2.07-5.467 5.97-5.467 3.134 0 5.57 2.234 5.57 5.218 0 3.114-1.963 5.62-4.689 5.62-.72 0-1.406-.294-1.81-.693a.227.227 0 0 0-.318 0 .226.226 0 0 0-.059.102c-.143.54-.372 1.417-.446 1.702-.133.512-.414 1.109-.696 1.628a.24.24 0 0 0 .154.347c.71.18 1.441.267 2.174.26 4.46-.04 8.29-3.79 8.416-8.25Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M12.5 21A8.501 8.501 0 0 1 6.49 6.49 8.5 8.5 0 1 1 12.5 21Zm.057-10.826V8H11.22a.79.79 0 0 0-.045.273c-.014.047-.03.081-.03.128-.137.807-.536 1.369-1.212 1.676-.2.097-.385.112-.583.097v1.753h.982c.016 2.466.016 3.738.016 3.802v.147c.123 1.076.66 1.72 1.61 1.963.384.111.797.161 1.212.161a5.457 5.457 0 0 0 1.58-.29v-2.062c-.305.096-.583.178-.828.257-.475.146-.874.05-1.198-.272-.03-.05-.076-.114-.092-.179a4.649 4.649 0 0 1-.074-.788v-2.74h2.13v-1.752h-2.131Z\" fill=\"currentColor\"></path> </svg>", "<svg fill=\"none\" viewbox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"> <path d=\"M19.845 4.059 3.382 10.404a.592.592 0 0 0 .048 1.123l4.184 1.222 1.56 4.9a.722.722 0 0 0 1.2.284l2.162-2.185 4.244 3.081a.888.888 0 0 0 1.39-.526l2.811-13.292c.138-.652-.51-1.194-1.136-.952Zm-2.064 2.95-7.647 6.688a.405.405 0 0 0-.136.26l-.294 2.588c-.01.084-.13.095-.155.014l-1.211-3.86a.404.404 0 0 1 .176-.466l9.03-5.54c.207-.127.42.156.237.316Z\" fill=\"currentColor\"></path> </svg>"];
+
+  /* «Поделиться» как на проде: сетка соцсетей, поле со ссылкой и кнопка копирования.
+     Клик по полю или кнопке выделяет ссылку, копирует и показывает тост */
+  function ShareSheet({ onClose, go, copy }) {
+    const box = useRef(null);
+    const url = 'https://ru.siberianhealth.com/ru/shop/catalog/product/501671/?referral=' + REF_NO;
+    const pick = () => {
+      const sel = window.getSelection();
+      if (sel && box.current) sel.selectAllChildren(box.current);
+      copy(url);
+    };
+    return (
+      <>
+        {STATE === 'none'
+          ? <div className="sheetPlainHead"><button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button></div>
+          : <ProgramHead onClose={onClose} go={go} />}
+        <div className="share" style={STATE === 'none' ? { paddingTop: 0 } : null}>
+          <h2 className="h1">{T.shareTitle}</h2>
+          <div className="shareGrid">
+            {SHARE_ICONS.map((svg, k) => <button type="button" key={k} className="shareItem" onClick={pick} dangerouslySetInnerHTML={{ __html: svg }} />)}
+          </div>
+          <div className="shareField" ref={box} onClick={pick}>{REF_URL}<b>{REF_NO}</b></div>
+          <button type="button" className="btn shareCopy" onClick={pick}>Скопировать реферальную ссылку</button>
+        </div>
+      </>
+    );
+  }
+
+  function HowSheet({ onClose, go }) {
+    return (
+      <>
+        <div className="sheetPlainHead">
+          <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
+        </div>
+        <div className="how">
+          <h2 className="h1">{T.howTitle}</h2>
+          {T.howSteps.map((s, i) => <div className="step" key={s}><i>{i + 1}</i><span>{s}</span></div>)}
+          <div className="step"><i className="emoji">🎉</i><span>{T.howDone}</span></div>
+          <button type="button" className="textLink" onClick={() => go('bo', 'Условия программы')}>{T.howTerms} <Chevron /></button>
+        </div>
+      </>
+    );
+  }
+
+  function Menu({ onClose, open, go }) {
+    const items1 = ['Личный кабинет', 'Мои заказы', 'Бонусы и кэшбэк', 'Награды', 'Мои адреса', 'Программа лояльности', 'Мои реферальные ссылки'];
+    const items2 = ['Мои подписки', 'Стать Бизнес-Партнером', 'Backoffice'];
+    const tap = (it) => {
+      if (it === 'Мои реферальные ссылки') open('refs');
+      else if (it === 'Бонусы и кэшбэк') go('bonus');
+    };
+    const AWARDS = [['500', '#3bb08f'], ['5000', '#2f4fe0'], ['200', '#a6ce39'], ['1000', '#6a1fd1'], ['★', '#9b4de0']];
+    return (
+      <div className="menu">
+        <div className="menuHead">
+          <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
+          <div className="menuUser"><span className="ava"><Snowflake color="#fff" size={30} /></span><span className="menuName">Алексей Батхитхарма Анатольевич</span></div>
+          <div className="acc">
+            <span>БОНУСНЫЙ СЧЕТ <span className="pill">152₽</span></span>
+            <span>КЭШБЭК: <span className="pill">0%</span> <span className="infoDot">i</span></span>
+          </div>
+        </div>
+        <div className="awards"><em>Награды</em>{AWARDS.map(([t, c]) => <span className="award" key={t} style={{ background: c }}>{t}</span>)}</div>
+        <div className="menuList">
+          {items1.map((it) => <button type="button" className="menuItem" key={it} onClick={() => tap(it)}>{it}</button>)}
+          {STATE === 'active' && <Banner60 onOpen={() => open('refs')} />}
+          {items2.map((it) => <button type="button" className="menuItem" key={it}>{it}</button>)}
+          <div className="menuDivider" />
+          <button type="button" className="menuItem">Выйти</button>
+        </div>
+      </div>
+    );
+  }
+
+  /* ---------- Приложение ---------- */
+  function App() {
+    const [stack, setStack] = useState([{ s: START }]);
+    const [sheet, setSheet] = useState(null);
+    const [howFrom, setHowFrom] = useState(null); // шторка, из которой открыли «Как это работает»
+    const [menu, setMenu] = useState(false);
+    const [toast, setToast] = useState(false);
+    const toastT = useRef(null);
+    const scrollRef = useRef(null);
+    const cur = stack[stack.length - 1];
+
+    useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [stack.length, cur.s]);
+
+    const go = (s, title) => {
+      const from = sheet;
+      setSheet(null); setMenu(false);
+      if (['main', 'product', 'thanks'].includes(s)) setStack([{ s }]);
+      // WHY: «Назад» должен вернуть в ту же шторку, из которой ушли (как на проде в этом же окне)
+      else setStack((st) => [...st.slice(0, -1), { ...st[st.length - 1], sheet: from }, { s, title }]);
+    };
+    const back = () => {
+      if (stack.length < 2) return;
+      const prev = stack[stack.length - 2];
+      setStack(stack.slice(0, -1)); setSheet(prev.sheet || null);
+    };
+    // «Как это работает» открывается шторкой поверх, остальное — экранами
+    const goFromSheet = (s, title) => {
+      if (s === 'how') { setHowFrom(sheet); setSheet('how'); } else go(s, title);
+    };
+    // WHY: «Как это работает» — вложенный попап; закрытие возвращает в попап, из которого его открыли
+    const closeSheet = () => setSheet(sheet === 'how' && howFrom ? howFrom : null);
+    const open = (name) => { setMenu(false); setSheet(name); };
+    // url приходит из поля ссылки; из onClick прилетает событие — тогда копируем общую ссылку
+    const copy = (url) => {
+      const text = typeof url === 'string' ? url : 'https://ru.siberianhealth.com/ru/?referral=' + REF_NO;
+      // WHY: на http/в iframe буфер может быть запрещён — тост показываем в любом случае
+      try { navigator.clipboard.writeText(text).catch(() => {}); } catch (e) { /* noop */ }
+      setToast(true); clearTimeout(toastT.current); toastT.current = setTimeout(() => setToast(false), 2000);
+    };
+
+    const sub = cur.s === 'bo' || cur.s === 'reg';
+    return (
+      <div className={LITE ? "sw lite" : "sw"}>
+        <div className="scroll" ref={scrollRef}>
+          {cur.s === 'main' && <MainScreen open={open} go={go} />}
+          {cur.s === 'product' && <ProductScreen open={open} go={go} />}
+          {cur.s === 'thanks' && <ThanksScreen open={open} />}
+          {cur.s === 'bonus' && (<>{stack.length > 1 && <button type="button" className="topBack" onClick={back}><span style={{ fontSize: 20 }}>‹</span> Назад</button>}<BonusScreen /></>)}
+          {cur.s === 'reg' && (<><button type="button" className="topBack" onClick={back}><span style={{ fontSize: 20 }}>‹</span> Назад</button><img className="slice" src="../assets/reg.jpg" alt="" /></>)}
+          {cur.s === 'bo' && <BoStub title={cur.title} back={back} />}
+        </div>
+        {!sub && <TabBar on={menu ? 'profile' : ''} go={go} openMenu={() => setMenu(true)} />}
+
+        {menu && <Menu onClose={() => setMenu(false)} open={open} go={go} />}
+        {sheet && (
+          <div className="scrim" onClick={closeSheet}>
+            <div className="sheet" onClick={(e) => e.stopPropagation()} style={{ position: 'relative' }}>
+              {sheet === 'refs' && <RefsSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
+              {sheet === 'share' && <ShareSheet onClose={() => setSheet(null)} go={goFromSheet} copy={copy} />}
+              {sheet === 'how' && <HowSheet onClose={closeSheet} go={goFromSheet} />}
+            </div>
+          </div>
+        )}
+        {toast && <div className="toast"><i>!</i>{T.copied}</div>}
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
