@@ -37,9 +37,6 @@
   .sw button { -webkit-tap-highlight-color: transparent; }
   .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .slice { display: block; width: 100%; height: auto; }
-  .sliceWrap { position: relative; }
-  /* WHY: прод вставлен скриншотами, кликабельные места поверх — прозрачные хотспоты в css-пикселях 375-сетки */
-  .hot { position: absolute; background: transparent; border: none; padding: 0; cursor: pointer; }
   .pad { padding: 0 16px; }
 
   /* Баннер программы: фон из SVG макета, текст и монетки — живые слои.
@@ -76,8 +73,6 @@
     background: #fff; display: flex; align-items: center; justify-content: center; color: var(--navy-ink);
   }
 
-  .cartBtn { position: absolute; border: none; border-radius: 4px; background: var(--brand); color: #fff; font-size: 16px; font-weight: 500; cursor: pointer; padding: 0; }
-  .cartBtn:active { background: var(--brand-d); }
 
   /* Таббар прода */
   .tabbar { flex: 0 0 auto; height: 52px; display: flex; border-top: 1px solid var(--line-2); background: #fff; }
@@ -132,7 +127,6 @@
   .refField .linkBox { margin-top: 0; }
   .refField .linkBox div { cursor: pointer; }
   .refField .linkBox button { background: #4fadea; }
-  .lite .refField .linkBox button { background: var(--brand); }
   .forClient { display: block; background: none; border: none; padding: 0; margin-top: 24px; color: var(--link); font-size: 14px; line-height: 18px; text-align: left; cursor: pointer; }
   .forClientSub { margin: 6px 0 0; font-size: 14px; line-height: 18px; color: var(--ink-2); }
   .linkBox button { flex: 0 0 48px; height: 48px; border: none; border-radius: 4px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -263,10 +257,7 @@
 
   /* Сценарий теста задаётся ссылкой: ?state=active|ended|none&start=main|product|thanks */
   const Q = new URLSearchParams(location.search);
-  /* Урезанный флоу (папка lite/): только «активна» / «неактивна», без истории начислений */
-  const LITE = window.__LITE__ === true;
-  const RAW_STATE = LITE && Q.get('state') === 'inactive' ? 'none' : Q.get('state');
-  const STATE = (LITE ? ['active', 'none'] : ['active', 'ended', 'none']).includes(RAW_STATE) ? RAW_STATE : 'active';
+  const STATE = ['active', 'ended', 'none'].includes(Q.get('state')) ? Q.get('state') : 'active';
   const START = ['main', 'product', 'thanks', 'bonus'].includes(Q.get('start')) ? Q.get('start') : 'main';
 
   const Chevron = ({ size = 12 }) => (
@@ -297,9 +288,6 @@
     <svg width="26" height="24" viewBox="0 0 26 24" fill="none" aria-hidden="true"><path d="M2 6h9M2 12h6M2 18h9" stroke="currentColor" strokeLinecap="round" /><circle cx="17" cy="11" r="5" stroke="currentColor" /><path d="m20.6 14.6 3.4 3.4" stroke="currentColor" strokeLinecap="round" /></svg>
   );
 
-  /* WHY: слои прода тянутся по ширине экрана, поэтому хотспоты задаём в % от слоя (координаты сняты в сетке 375px) */
-  const at = (l, t, w, h, H) => ({ left: l / 3.75 + '%', top: (t / H) * 100 + '%', width: w / 3.75 + '%', height: (h / H) * 100 + '%' });
-  const PRODUCT_A_H = 713;
 
   /* Анимация отсвета стартует, когда баннер впервые попал в экран, а не при загрузке страницы */
   function useInView() {
@@ -362,83 +350,85 @@
   }
 
   /* ---------- Экраны ---------- */
-  /* Главная — живая вёрстка прода (снимок DOM+CSS), изолирована в shadow DOM, чтобы стили прода и прототипа не смешивались */
+  /* Главная и продуктовая — живая вёрстка прода (снимок DOM+CSS), изолирована в shadow DOM,
+     чтобы стили прода и прототипа не смешивались */
   const PROD_FIX = `
     :host { display: block; font-family: Gerbera, sans-serif; color: #141414; background: #fff; -webkit-text-size-adjust: 100%; }
     .prod-root { overflow-x: hidden; }
-    .ref-slot { padding: 16px 16px 0; }
     /* WHY: JS-слайдеров прода нет — превращаем их в нативный горизонтальный скролл со снапом */
     .swiper-wrapper, .osn-slider__wrapper { transform: none !important; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
     .swiper-wrapper::-webkit-scrollbar, .osn-slider__wrapper::-webkit-scrollbar { display: none; }
     .swiper-slide, .osn-slider__slide { scroll-snap-align: start; flex-shrink: 0; }
+    [data-go], [data-share] { cursor: pointer; }
+  `;
+  const MAIN_FIX = `
+    .ref-slot { padding: 16px 16px 0; }
     /* JS прода сдвигал ленту товаров на 16px трансформом — возвращаем отступ паддингом */
     .osn-slider__wrapper { padding: 0 16px; scroll-padding: 0 16px; box-sizing: border-box; }
-    [data-go] { cursor: pointer; }
     /* Главный слайдер: JS прода выставлял ширину слайда 375px и высоту обёртки — делаем резиновым */
     .im21--main-banner-slider .swiper-wrapper { height: auto !important; }
     .im21--main-banner-slider .swiper-slide { width: 100% !important; }
   `;
-  function ProdMain({ go, children }) {
+  const PRODUCT_FIX = `
+    /* WHY: на мобилке CTA «В корзину» по макету 160px */
+    [data-ref="buy"] .sw-button { width: 160px; flex: 0 0 160px; }
+    [data-ref="buy"] { justify-content: space-between; }
+    /* Пока программа активна, «Поделиться» живёт в баннере; после — дефолт прода */
+    :host(.is-active) [data-ref="buy"] [data-share] { display: none; }
+    /* Галерея: слайды на всю ширину */
+    .pp-summary__slider .swiper-slide { width: 100% !important; }
+    .pp-summary__slider .swiper-wrapper { height: auto !important; }
+  `;
+  function ProdPage({ page, fix, go, open, children }) {
     const host = useRef(null);
     useEffect(() => {
       const el = host.current;
       const root = el.shadowRoot || el.attachShadow({ mode: 'open' });
       let alive = true;
-      fetch('assets/main-prod.html').then((r) => r.text()).then((html) => {
+      fetch('assets/' + page + '-prod.html').then((r) => r.text()).then((html) => {
         if (!alive) return;
-        root.innerHTML = '<link rel="stylesheet" href="assets/main-prod.css"><style>' + PROD_FIX + '</style>' + html;
-        // Точки главного слайдера следуют за свайпом, стартуем с первого слайда
-        const wrap = root.querySelector('.im21--main-banner-slider .swiper-wrapper');
-        const dots = [...root.querySelectorAll('.im21--main-banner-slider .im21--pagination__bullet')];
-        if (wrap && dots.length) {
+        root.innerHTML = '<link rel="stylesheet" href="assets/' + page + '-prod.css"><style>' + PROD_FIX + fix + '</style>' + html;
+        // Точки слайдеров следуют за свайпом, стартуем с первого слайда
+        root.querySelectorAll('.swiper-container').forEach((box) => {
+          const wrap = box.querySelector('.swiper-wrapper');
+          const dots = [...(box.parentElement || box).querySelectorAll('.im21--pagination__bullet, .swiper-pagination-bullet')];
+          if (!wrap) return;
+          wrap.scrollLeft = 0;
+          if (!dots.length) return;
+          const cls = dots[0].classList.contains('im21--pagination__bullet') ? 'im21--pagination__bullet_active' : 'swiper-pagination-bullet-active';
           const sync = () => {
-            const i = Math.round(wrap.scrollLeft / wrap.clientWidth);
-            dots.forEach((d, k) => d.classList.toggle('im21--pagination__bullet_active', k === i));
+            const i = Math.round(wrap.scrollLeft / (wrap.clientWidth || 1));
+            dots.forEach((d, k) => d.classList.toggle(cls, k === i));
           };
-          wrap.scrollLeft = 0; sync();
-          wrap.addEventListener('scroll', sync, { passive: true });
-        }
+          sync(); wrap.addEventListener('scroll', sync, { passive: true });
+        });
       });
       const onClick = (e) => {
-        const card = e.target.closest('[data-go]');
-        if (card) { e.preventDefault(); go(card.getAttribute('data-go')); return; }
+        const target = e.target.closest('[data-go]');
+        if (target) { e.preventDefault(); go(target.getAttribute('data-go')); return; }
+        if (e.target.closest('[data-share]')) { e.preventDefault(); open('share'); return; }
         if (e.target.closest('a')) e.preventDefault();
       };
       root.addEventListener('click', onClick);
       return () => { alive = false; root.removeEventListener('click', onClick); };
     }, []);
-    return <div ref={host}>{children}</div>;
+    return <div ref={host} className={STATE === 'active' ? 'is-active' : ''}>{children}</div>;
   }
 
   function MainScreen({ open, go }) {
     return (
-      <ProdMain go={go}>
+      <ProdPage page="main" fix={MAIN_FIX} go={go} open={open}>
         {STATE === 'active' && <div slot="ref-banner"><Banner140 onOpen={() => open('refs')} /></div>}
-      </ProdMain>
+      </ProdPage>
     );
   }
 
+  /* Продуктовая 501671 — «В корзину» сразу ведёт на сенкью (оформление заказа для теста пропускаем) */
   function ProductScreen({ open, go }) {
     return (
-      <>
-        <div className="sliceWrap">
-          <img className="slice" src="assets/product-a.jpg" alt="" />
-          <button type="button" className="hot" aria-label="Главная" style={at(8, 56, 70, 28, PRODUCT_A_H)} onClick={() => go('main')} />
-          {/* WHY: «В корзину» сразу ведёт на сенкью — для теста оформление заказа пропускаем */}
-          {/* WHY: на мобилке CTA «В корзину» по макету 160px — растровую кнопку прода закрываем и рисуем свою */}
-          <div style={{ position: 'absolute', ...at(14, 663, 316, 44, PRODUCT_A_H), background: '#fff' }} />
-          <button type="button" className="cartBtn" style={{ ...at(16, 665, 0, 40, PRODUCT_A_H), width: 160 }} onClick={() => go('thanks')}>В корзину</button>
-          {/* WHY: пока программа активна, «Поделиться» живёт в баннере — иконку прода у CTA закрываем белой плашкой; после завершения — дефолт прода */}
-          {STATE !== 'active'
-            ? <button type="button" className="hot" aria-label="Поделиться" style={at(328, 664, 44, 44, PRODUCT_A_H)} onClick={() => open('share')} />
-            : <div style={{ position: 'absolute', ...at(330, 662, 45, 46, PRODUCT_A_H), background: '#fff' }} />}
-        </div>
-        {/* Баннер сразу под «В корзину», над строкой «Удобная доставка» */}
-        {STATE === 'active' && <div className="pad" style={{ margin: '8px 0 4px' }}><Banner104 onShare={() => open('share')} /></div>}
-        <img className="slice" src="assets/product-a2.jpg" alt="" />
-        {/* Полная продуктовая прода до футера, нарезана частями по 2000px, чтобы грузилась по мере прокрутки */}
-        {[1, 2, 3, 4, 5, 6].map((i) => <img className="slice" key={i} src={`assets/product-b${i}.jpg`} alt="" loading={i > 1 ? 'lazy' : undefined} />)}
-      </>
+      <ProdPage page="product" fix={PRODUCT_FIX} go={go} open={open}>
+        {STATE === 'active' && <div slot="ref-banner" style={{ marginTop: 16 }}><Banner104 onShare={() => open('share')} /></div>}
+      </ProdPage>
     );
   }
 
@@ -529,7 +519,7 @@
           {ended
             ? <button type="button" onClick={() => go('bo', 'Условия программы')}>{T.terms} <Chevron /></button>
             : <button type="button" onClick={() => go('how')}>{T.how} <Chevron /></button>}
-          {!LITE && <button type="button" onClick={() => go('bonus')}>{T.history} <Chevron /></button>}
+          <button type="button" onClick={() => go('bonus')}>{T.history} <Chevron /></button>
         </div>
       </div>
     );
@@ -565,22 +555,9 @@
         <ProgramHead onClose={onClose} go={go} />
         <div className="refs" style={STATE === 'none' ? { paddingTop: 0 } : null}>
           <h2 className="h1">{T.refsTitle}</h2>
-          {LITE && STATE === 'none' ? (
-            /* Неактивная программа в урезанном флоу — список ссылок как сейчас на проде */
-            <>
-              <div className="info"><i>i</i><span>{T.refsInfo}<b>{REF_NO}</b></span></div>
-              {REF_LINKS.map((l, k) => (
-                <button type="button" className="row" key={l.label} onClick={() => copy(l.url + REF_NO)}><span className="t t--link">{T.copyRows[k]}</span><CopyIcon /></button>
-              ))}
-              <button type="button" className="row" onClick={() => go('reg')}>
-                <span className="t">{T.forClient.t}<span className="sub">{T.forClient.s}</span></span><Chevron size={14} />
-              </button>
-            </>
-          ) : <>
           {REF_LINKS.map((l) => <RefField key={l.label} link={l} copy={copy} />)}
           <button type="button" className="forClient" onClick={() => go('reg')}>{T.forClientShort}</button>
           <p className="forClientSub">{T.forClient.s}</p>
-          </>}
         </div>
       </>
     );
@@ -704,7 +681,7 @@
 
     const sub = cur.s === 'bo' || cur.s === 'reg';
     return (
-      <div className={LITE ? "sw lite" : "sw"}>
+      <div className="sw">
         <div className="scroll" ref={scrollRef}>
           {cur.s === 'main' && <MainScreen open={open} go={go} />}
           {cur.s === 'product' && <ProductScreen open={open} go={go} />}
