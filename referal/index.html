@@ -59,7 +59,8 @@
   .banner--104 { min-height: 72px; justify-content: center; padding: 14px 16px; --glow: url(assets/glow-banner-104.svg); }
   .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; --glow: url(assets/glow-menu-60.svg); }
   .banner .coins { position: absolute; pointer-events: none; }
-  .banner--140 .coins { right: 0; top: 22px; width: 96px; }
+  /* WHY: позиции монеток сняты с компонентов Figma (12619:26444): картинка 148×147, смещения от правого края */
+  .banner--140 .coins { right: -19.5px; top: 11px; width: 120.5px; }
   .banner--60  .coins { right: -1px; top: -7px; width: 110px; }
   .bTitle, .bText, .bLink { position: relative; }
   .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 100px; }
@@ -94,7 +95,7 @@
   .pHead { position: relative; color: #fff; padding: 60px 16px 20px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
   .pHead--ended { --glow: url(assets/glow-sheet-196.svg); padding-top: 64px; }
   .pHead .sheetClose { color: #fff; top: 20px; }
-  .pHead .coins { position: absolute; right: 10px; top: 62px; width: 88px; height: 88px; pointer-events: none; }
+  .pHead .coins { position: absolute; right: 1px; top: 47px; width: 131px; pointer-events: none; }
   .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 128px); }
   .pText { font-size: 14px; line-height: 18px; margin-top: 8px; max-width: calc(100% - 100px); }
   .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
