@@ -60,10 +60,10 @@
   .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; --glow: url(assets/glow-menu-60.svg); }
   .banner .coins { position: absolute; pointer-events: none; }
   /* WHY: позиции монеток сняты с компонентов Figma (12619:26444): картинка 148×147, смещения от правого края */
-  .banner--140 .coins { right: -19.5px; top: 11px; width: 120.5px; }
+  .banner--140 .coins { right: -13.453px; top: 10.872px; width: 131.086px; }
   .banner--60  .coins { right: -1px; top: -7px; width: 110px; }
   .bTitle, .bText, .bLink { position: relative; }
-  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 100px; }
+  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 72px; }
   .bText { margin-top: 8px; font-size: 14px; line-height: 18px; max-width: calc(100% - 88px); }
   .banner--60 .bText { margin-top: 0; max-width: calc(100% - 86px); }
   .banner--104 .bText { margin-top: 0; max-width: calc(100% - 64px); }
@@ -92,20 +92,20 @@
   .sheetPlainHead { position: relative; height: 56px; }
 
   /* Шапка программы в шторке */
-  .pHead { position: relative; color: #fff; padding: 60px 16px 20px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
+  .pHead { position: relative; color: #fff; padding: 60px 16px 16px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
   .pHead--ended { --glow: url(assets/glow-sheet-196.svg); padding-top: 60px; }
   .pHead .sheetClose { color: #fff; top: 20px; }
-  .pHead .coins { position: absolute; right: -20.5px; top: 48px; width: 131px; pointer-events: none; }
-  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 128px); }
-  .pHead--ended .pTitle { max-width: calc(100% - 100px); }
-  .pHead--ended .pText { max-width: calc(100% - 92px); }
-  .pText { font-size: 14px; line-height: 18px; margin-top: 8px; max-width: calc(100% - 100px); }
-  .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
+  .pHead .coins { position: absolute; right: -20.453px; top: 47.872px; width: 131.086px; pointer-events: none; }
+  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: 255px; }
+  .pText { font-weight: 300; font-size: 14px; line-height: 18px; margin-top: 8px; max-width: 255px; }
+  .pHead--ended .pTitle, .pHead--ended .pText { max-width: 245px; }
+  .pHead--ended .coins { top: 48.872px; }
+  .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 12px; min-height: 24px; align-items: center; }
   .pLinks button { background: none; border: none; padding: 0; color: var(--cyan-link); font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .badge { position: absolute; left: 16px; top: 24px; background: var(--badge); color: var(--navy-ink); font-size: 14px; font-weight: 500; line-height: 24px; padding: 0 8px; border-radius: 4px; }
 
   .h1 { font-size: 24px; font-weight: 500; line-height: 30px; margin: 0; color: var(--navy-ink); }
-  .refs { padding: 24px 16px 40px; }
+  .refs { padding: 24px 16px 8px; }
   .info { display: flex; gap: 12px; align-items: flex-start; background: var(--cyan-tint); border-radius: 8px; padding: 14px 16px; margin: 20px 0 8px; font-size: 14px; line-height: 18px; }
   .info i { flex: 0 0 20px; height: 20px; border-radius: 50%; background: var(--brand); color: #fff; font-style: normal; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-top: -1px; }
   .row { display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: none; border-bottom: 1px solid var(--line); padding: 16px 0; text-align: left; cursor: pointer; color: inherit; }
@@ -128,6 +128,8 @@
   .refField .linkBox { margin-top: 0; }
   .refField .linkBox div { cursor: pointer; }
   .refField .linkBox button { background: #4fadea; }
+  .forClient { display: block; background: none; border: none; padding: 0; margin-top: 24px; color: var(--link); font-size: 14px; line-height: 18px; text-align: left; cursor: pointer; }
+  .forClientSub { margin: 6px 0 0; font-size: 14px; line-height: 18px; color: var(--ink-2); }
   .linkBox button { flex: 0 0 48px; height: 48px; border: none; border-radius: 4px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .shareGrid { display: grid; grid-template-columns: repeat(6, 40px); justify-content: space-between; row-gap: 16px; margin-top: 24px; }
   .shareItem { width: 40px; height: 40px; border-radius: 50%; border: none; padding: 8px; background: #c4c6cc; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -227,7 +229,7 @@
     menuText: 'Получайте 10% с первого заказа каждого приглашенного друга',
     headTitle: 'Ваш Консультант открыл персональный доступ к Реферальной программе',
     headActive: 'Получайте 10% с первого заказа каждого приглашенного друга',
-    headTitleEnded: '10% кэшбэк за покупки новых клиентов не начисляются',
+    headEndedTitle: '10% кэшбэк за покупки новых клиентов не начисляются',
     headEnded: 'Для клиентов, зарегистрированных до завершения программы, условия сохраняются',
     ended: 'Программа завершена',
     how: 'Как это работает', history: 'История начислений', terms: 'Условия',
@@ -235,6 +237,7 @@
     refsInfo: 'Все ссылки уже содержат ваш реферальный номер ',
     copyRows: ['Страница, на которой вы находитесь', 'Регистрация Привилегированного клиента', 'Регистрация Бизнес-Партнера'],
     bo: { t: 'Реферальные ссылки из BackOffice', s: 'Сформировать ссылку на требуемую страницу с возможностью выбора страны и языка, а также на промостраницы.' },
+    forClientShort: 'Регистрация за Клиента под вашим Рег. номером',
     forClient: { t: 'Регистрация за Клиента под вашим Регистрационным номером', s: 'Введите данные Клиента при регистрации вместо него.' },
     copied: 'Ссылка скопирована',
     shareTitle: 'Поделиться',
@@ -511,7 +514,7 @@
         {ended && <span className="badge">{T.ended}</span>}
         <Coins />
         <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
-        <div className="pTitle">{ended ? T.headTitleEnded : T.headTitle}</div>
+        <div className="pTitle">{ended ? T.headEndedTitle : T.headTitle}</div>
         <div className="pText">{ended ? T.headEnded : T.headActive}</div>
         <div className="pLinks">
           {ended
