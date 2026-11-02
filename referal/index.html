@@ -56,17 +56,17 @@
   @keyframes glowIn { to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .banner::before, .pHead::before { animation: none !important; opacity: 1; transform: none; } }
   .banner--140 { min-height: 140px; --glow: url(assets/glow-banner-140.svg); }
-  .banner--104 { min-height: 104px; --glow: url(assets/glow-banner-104.svg); }
+  .banner--104 { min-height: 72px; justify-content: center; padding: 14px 16px; --glow: url(assets/glow-banner-104.svg); }
   .banner--60  { min-height: 60px; justify-content: center; padding: 10px 16px; --glow: url(assets/glow-menu-60.svg); }
   .banner .coins { position: absolute; pointer-events: none; }
-  .banner--140 .coins { right: -26px; top: 7px; width: 127px; }
-  .banner--104 .coins { right: -26px; top: -11px; width: 127px; }
+  .banner--140 .coins { right: 0; top: 22px; width: 96px; }
   .banner--60  .coins { right: -1px; top: -7px; width: 110px; }
   .bTitle, .bText, .bLink { position: relative; }
-  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 96px; }
-  .bText { margin-top: 8px; font-size: 14px; line-height: 18px; max-width: calc(100% - 96px); }
-  .banner--60 .bText { margin-top: 0; max-width: calc(100% - 100px); }
-  .banner--104 .bTitle { padding-right: 56px; }
+  .bTitle { font-size: 16px; font-weight: 500; line-height: 20px; padding-right: 100px; }
+  .bText { margin-top: 8px; font-size: 14px; line-height: 18px; max-width: calc(100% - 88px); }
+  .banner--60 .bText { margin-top: 0; max-width: calc(100% - 86px); }
+  .banner--104 .bText { margin-top: 0; max-width: calc(100% - 64px); }
+  .banner--104 .bShare { top: 50%; transform: translateY(-50%); }
   .bLink { margin-top: auto; padding-top: 14px; font-size: 14px; color: var(--cyan-link); display: flex; align-items: center; gap: 8px; }
   .bShare {
     position: absolute; right: 16px; top: 20px; width: 40px; height: 40px; border-radius: 12px;
@@ -91,14 +91,12 @@
   .sheetPlainHead { position: relative; height: 56px; }
 
   /* Шапка программы в шторке */
-  .pHead { position: relative; color: #fff; padding: 48px 16px 20px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
+  .pHead { position: relative; color: #fff; padding: 60px 16px 20px; background: var(--navy); --glow: url(assets/glow-sheet-178.svg); isolation: isolate; overflow: hidden; min-height: 178px; box-sizing: border-box; border-radius: 16px 16px 0 0; }
   .pHead--ended { --glow: url(assets/glow-sheet-196.svg); padding-top: 64px; }
   .pHead .sheetClose { color: #fff; top: 20px; }
-  .pHead .coins { position: absolute; right: 10px; top: 49px; width: 88px; height: 88px; pointer-events: none; }
-  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 88px); }
-  .pHead--ended .pTitle { max-width: none; }
-  .pText { font-size: 14px; line-height: 18px; margin-top: 10px; max-width: calc(100% - 70px); }
-  .pHead--ended .pText { max-width: none; }
+  .pHead .coins { position: absolute; right: 10px; top: 62px; width: 88px; height: 88px; pointer-events: none; }
+  .pTitle { font-size: 16px; font-weight: 500; line-height: 20px; max-width: calc(100% - 128px); }
+  .pText { font-size: 14px; line-height: 18px; margin-top: 8px; max-width: calc(100% - 100px); }
   .pLinks { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 16px; }
   .pLinks button { background: none; border: none; padding: 0; color: var(--cyan-link); font-size: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
   .badge { position: absolute; left: 16px; top: 24px; background: var(--badge); color: var(--navy-ink); font-size: 14px; font-weight: 500; line-height: 24px; padding: 0 8px; border-radius: 4px; }
@@ -222,12 +220,12 @@
   const REF_NO = '4276762';
   const REF_URL = 'https://…/507749/?referral=';
   const T = {
-    bannerTitle: 'Бонусы за приглашения',
-    bannerText: 'Получите 10% с первого заказа приглашенного вами друга.',
+    bannerTitle: 'Ваш Консультант открыл персональный доступ к Реферальной программе',
+    bannerText: 'Получайте 10% с первого заказа каждого приглашенного друга',
     bannerLink: 'Мои реферальные ссылки',
-    menuText: 'Получите 10% с первого заказа приглашенного вами друга.',
-    headTitle: 'Получите 10% с первого заказа приглашенного вами друга',
-    headActive: 'После регистрации по вашей ссылке',
+    menuText: 'Получайте 10% с первого заказа каждого приглашенного друга',
+    headTitle: 'Ваш Консультант открыл персональный доступ к Реферальной программе',
+    headActive: 'Получайте 10% с первого заказа каждого приглашенного друга',
     headEnded: 'Для клиентов, зарегистрированных до завершения программы, условия сохраняются',
     ended: 'Программа завершена',
     how: 'Как это работает', history: 'История начислений', terms: 'Условия',
@@ -239,9 +237,9 @@
     forClient: { t: 'Регистрация за Клиента под вашим Регистрационным номером', s: 'Введите данные Клиента при регистрации вместо него.' },
     copied: 'Ссылка скопирована',
     shareTitle: 'Поделиться',
-    howTitle: 'Как получить 10% с первого заказа приглашенного вами друга',
-    howSteps: ['Отправьте свою реферальную ссылку новому клиенту', 'Он должен оплатить первый заказ не позднее седьмого календарного дня после регистрации'],
-    howDone: 'Готово! 10% с первого заказа нового клиента ваши',
+    howTitle: 'Как получить кэшбек 10% с первого заказа приглашенного друга?',
+    howSteps: ['Отправьте другу свою реферальную ссылку.', 'Он должен зарегистрироваться по ссылке и оплатить первый заказ не позднее седьмого календарного дня после регистрации.'],
+    howDone: 'Готово! Вы получаете 10% с его первого заказа на бонусный счет!',
     howTerms: 'Полные условия',
   };
   const HISTORY = [
@@ -321,8 +319,6 @@
     const [ref, cls] = useInView();
     return (
       <button type="button" ref={ref} className={"banner banner--104" + cls} onClick={onShare}>
-        <Coins />
-        <span className="bTitle">{T.bannerTitle}</span>
         <span className="bText">{T.bannerText}</span>
         <span className="bShare"><ShareIcon /></span>
       </button>
@@ -506,12 +502,13 @@
   }
 
   /* ---------- Шторки ---------- */
-  function ProgramHead({ onClose, go }) {
+  function ProgramHead({ onClose, go, history = true }) {
     if (STATE === 'none') return <div className="sheetPlainHead"><button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button></div>;
     const ended = STATE === 'ended';
     return (
       <div className={'pHead' + (ended ? ' pHead--ended' : '')}>
-        {ended ? <span className="badge">{T.ended}</span> : <Coins />}
+        {ended && <span className="badge">{T.ended}</span>}
+        <Coins />
         <button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button>
         <div className="pTitle">{T.headTitle}</div>
         <div className="pText">{ended ? T.headEnded : T.headActive}</div>
@@ -519,7 +516,7 @@
           {ended
             ? <button type="button" onClick={() => go('bo', 'Условия программы')}>{T.terms} <Chevron /></button>
             : <button type="button" onClick={() => go('how')}>{T.how} <Chevron /></button>}
-          <button type="button" onClick={() => go('bonus')}>{T.history} <Chevron /></button>
+          {history && <button type="button" onClick={() => go('bonus')}>{T.history} <Chevron /></button>}
         </div>
       </div>
     );
@@ -529,7 +526,6 @@
   const REF_LINKS = [
     { label: 'Страница, которой вы делитесь', url: 'https://ru.siberianhealth.com/ru/shop/catalog/product/501671/?referral=' },
     { label: 'Регистрация Привилегированного клиента', url: 'https://ru.siberianhealth.com/ru/shop/user/registration/PRIVILEGED_CLIENT/?referral=' },
-    { label: 'Регистрация Бизнес-Партнера', url: 'https://ru.siberianhealth.com/ru/shop/user/registration/CONSULTANT/?referral=' },
   ];
   function RefField({ link, copy }) {
     const box = useRef(null);
@@ -580,7 +576,7 @@
       <>
         {STATE === 'none'
           ? <div className="sheetPlainHead"><button type="button" className="sheetClose" aria-label="Закрыть" onClick={onClose}><Close /></button></div>
-          : <ProgramHead onClose={onClose} go={go} />}
+          : <ProgramHead onClose={onClose} go={go} history={false} />}
         <div className="share" style={STATE === 'none' ? { paddingTop: 0 } : null}>
           <h2 className="h1">{T.shareTitle}</h2>
           <div className="shareGrid">
