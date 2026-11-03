@@ -272,10 +272,7 @@
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><rect x="5.5" y="5.5" width="9" height="9" rx="1.5" stroke="currentColor" /><path d="M3.5 11V4.5a1 1 0 0 1 1-1H11" stroke="currentColor" strokeLinecap="round" /></svg>
   );
   const ShareIcon = () => (
-    <svg width="24" height="24" viewBox="294 30 26 20" fill="none" aria-hidden="true"><path d="M309.095 36.2667C309.095 36.2667 296 34.6667 296 48C300.19 40 309.095 42.6667 309.095 42.6667V46.9333L318 39.4667L309.095 32V36.2667Z" stroke="currentColor" strokeLinejoin="round" /></svg>
-  );
-  const LinkIcon = () => (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fillRule="evenodd" clipRule="evenodd" d="M14.0933 8.26667C14.0933 8.26667 0.998046 6.66667 0.998046 20C5.18852 12 14.0933 14.6667 14.0933 14.6667V18.9333L22.998 11.4667L14.0933 4V8.26667Z" stroke="currentColor" strokeLinejoin="round" /></svg>
   );
   const Snowflake = ({ color = 'currentColor', size = 24 }) => (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M13.41 15.42 9.74 21.77H6.92L12 12.98l1.41 2.44Zm3.67 6.35h-2.82l-1.7-2.93 1.41-2.44 3.11 5.37ZM6.08 21.29l-1.41-2.45 1.69-2.93h2.82l-3.1 5.38Zm13.25-2.45-1.41 2.44-5.07-8.8h2.82l3.66 6.36ZM9.74 14.93H2.41L1 12.49h10.15l-1.41 2.44Zm11.85 0H18.2l-1.41-2.44H23l-1.41 2.44ZM11.16 11.51H8.33L4.67 5.16l1.41-2.44 5.08 8.79Zm-3.95 0H1l1.41-2.44h3.39l1.41 2.44Zm15.79 0H12.85l1.41-2.44h7.33L23 11.51ZM9.74 2.23 12 6.14l2.26-3.91h2.82L12 11.02 6.92 2.23h2.82Zm9.59 2.93-1.69 2.93h-2.82l3.1-5.37 1.41 2.44Z" fill={color} /></svg>
@@ -543,7 +540,7 @@
         <div className="refLabel">{link.label}</div>
         <div className="linkBox">
           <div ref={box} onClick={pick}>{REF_URL}<b>{REF_NO}</b></div>
-          <button type="button" aria-label="Скопировать ссылку" onClick={pick}><LinkIcon /></button>
+          <button type="button" aria-label="Скопировать ссылку" onClick={pick}><ShareIcon /></button>
         </div>
       </div>
     );
