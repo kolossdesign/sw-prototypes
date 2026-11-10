@@ -381,6 +381,8 @@
   `;
   function ProdPage({ page, fix, go, open, children }) {
     const host = useRef(null);
+    const actions = useRef({ go, open });
+    actions.current = { go, open };
     useEffect(() => {
       const el = host.current;
       const root = el.shadowRoot || el.attachShadow({ mode: 'open' });
@@ -405,8 +407,8 @@
       });
       const onClick = (e) => {
         const target = e.target.closest('[data-go]');
-        if (target) { e.preventDefault(); go(target.getAttribute('data-go')); return; }
-        if (e.target.closest('[data-share]')) { e.preventDefault(); open('share'); return; }
+        if (target) { e.preventDefault(); actions.current.go(target.getAttribute('data-go')); return; }
+        if (e.target.closest('[data-share]')) { e.preventDefault(); actions.current.open('share'); return; }
         if (e.target.closest('a')) e.preventDefault();
       };
       root.addEventListener('click', onClick);
@@ -639,7 +641,11 @@
 
   /* ---------- Приложение ---------- */
   function App() {
-    const [stack, setStack] = useState([{ s: START }]);
+    const [stack, setStack] = useState(() => {
+      const saved = window.history.state;
+      return saved?.swReferral === STATE && Array.isArray(saved.stack) && saved.stack.length
+        ? saved.stack : [{ s: START }];
+    });
     const [sheet, setSheet] = useState(null);
     const [howFrom, setHowFrom] = useState(null); // шторка, из которой открыли «Как это работает»
     const [menu, setMenu] = useState(false);
@@ -650,17 +656,34 @@
 
     useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [stack.length, cur.s]);
 
+    useEffect(() => {
+      // Each screen is a real browser history entry; reload preserves its back stack.
+      window.history.replaceState({ swReferral: STATE, stack }, '', window.location.href);
+      const onPopState = (event) => {
+        const saved = event.state;
+        if (saved?.swReferral !== STATE || !Array.isArray(saved.stack)) return;
+        setStack(saved.stack);
+        setSheet(saved.stack[saved.stack.length - 1].sheet || null);
+        setMenu(false);
+        setToast(false);
+      };
+      window.addEventListener('popstate', onPopState);
+      return () => window.removeEventListener('popstate', onPopState);
+    }, []);
+
     const go = (s, title) => {
-      const from = sheet;
       setSheet(null); setMenu(false);
-      if (['main', 'product', 'thanks'].includes(s)) setStack([{ s }]);
-      // WHY: «Назад» должен вернуть в ту же шторку, из которой ушли (как на проде в этом же окне)
-      else setStack((st) => [...st.slice(0, -1), { ...st[st.length - 1], sheet: from }, { s, title }]);
+      if (s === cur.s && title === cur.title) return;
+      const previous = [...stack.slice(0, -1), { ...cur, sheet }];
+      window.history.replaceState({ swReferral: STATE, stack: previous }, '', window.location.href);
+      const next = [...previous, { s, title }];
+      const url = new URL(window.location.href);
+      url.searchParams.set('start', s);
+      window.history.pushState({ swReferral: STATE, stack: next }, '', url);
+      setStack(next);
     };
     const back = () => {
-      if (stack.length < 2) return;
-      const prev = stack[stack.length - 2];
-      setStack(stack.slice(0, -1)); setSheet(prev.sheet || null);
+      if (stack.length > 1) window.history.back();
     };
     // «Как это работает» открывается шторкой поверх, остальное — экранами
     const goFromSheet = (s, title) => {
